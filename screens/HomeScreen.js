@@ -1,24 +1,127 @@
 //Parking/screens/HomeScreen.js
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { getCheckins } from '../storage/CheckinStorage';
+import VehicleCard from '../components/VehicleCard';
 
 export default function HomeScreen({ navigation }) {
+
+    const [vehicles, setVehicles] = useState([]);
+
+    const loadVehicles = async () => {
+        const data = await getCheckins();
+        setVehicles(data);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadVehicles();
+        }, [])
+    );
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Hello Home</Text>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('Checkin')}
-            >
-                <Text style={styles.buttonText}>Vehicle In</Text>
-            </TouchableOpacity>
-        </View>
+        <ScrollView style={styles.container}>
+
+            {/* Vehicle IN Button */}
+
+            <View style={styles.actionGrid}>
+
+                <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => navigation.navigate('Checkin')}
+                >
+                    <View style={styles.iconCircle}>
+                        <MaterialCommunityIcons name="login" size={30} color="#059669" />
+                    </View>
+
+                    <Text style={styles.actionText}>Vehicle IN</Text>
+                </TouchableOpacity>
+
+            </View>
+
+            {/* Latest Vehicles */}
+
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>
+                    Latest Added Vehicle
+                </Text>
+            </View>
+
+            <View style={styles.vehicleList}>
+
+                {vehicles.slice(0, 5).map((item) => (
+                    <VehicleCard key={item.id} item={item} />
+                ))}
+
+                {vehicles.length === 0 && (
+                    <Text style={styles.emptyText}>
+                        No vehicles yet
+                    </Text>
+                )}
+
+            </View>
+
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
-    button: { backgroundColor: '#137fec', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 16 },
-    buttonText: { color: '#fff', fontWeight: '700', fontSize: 16 }
+
+    container: {
+        flex: 1,
+        backgroundColor: '#f8fafc',
+        padding: 16
+    },
+
+    actionGrid: {
+        flexDirection: 'row',
+        marginBottom: 18
+    },
+
+    actionBtn: {
+        flex: 1,
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        alignItems: 'center'
+    },
+
+    iconCircle: {
+        height: 56,
+        width: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#d1fae5'
+    },
+
+    actionText: {
+        marginTop: 10,
+        fontWeight: '700'
+    },
+
+    sectionHeader: {
+        marginBottom: 10
+    },
+
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+
+    vehicleList: {
+        gap: 12
+    },
+
+    emptyText: {
+        textAlign: 'center',
+        color: '#6b7280',
+        marginTop: 20
+    }
+
 });
