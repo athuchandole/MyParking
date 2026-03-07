@@ -1,17 +1,29 @@
-// screens/Checkin.js
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+//Parking/screens/Checkin.js
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Modal, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { getParkingRates } from '../storage/ParkingRate';
+import { saveCheckin } from '../storage/CheckinStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import { CameraView } from 'expo-camera';
 
 export default function Checkin({ navigation }) {
+
+    const cameraRef = useRef(null);
 
     const [vehicleNumber, setVehicleNumber] = useState('');
     const [driverName, setDriverName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [keyboardType, setKeyboardType] = useState('default');
+
+    const [vehicleImage, setVehicleImage] = useState(null);
+    const [driverImage, setDriverImage] = useState(null);
+
+    const [cameraVisible, setCameraVisible] = useState(false);
+    const [captureType, setCaptureType] = useState(null);
+
+    const [flash, setFlash] = useState('off');
 
     const [selectedVehicle, setSelectedVehicle] = useState('bike');
     const [rates, setRates] = useState({ bike: '10', auto: '20', car: '40' });
@@ -43,7 +55,6 @@ export default function Checkin({ navigation }) {
 
     const currentRate = rates[selectedVehicle] || '0';
 
-    // Vehicle number formatter
     const handleVehicleNumber = (text) => {
 
         let clean = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -59,11 +70,62 @@ export default function Checkin({ navigation }) {
 
         setVehicleNumber(formatted);
 
-        // keyboard switching
         if (clean.length < 2) setKeyboardType('default');
         else if (clean.length < 4) setKeyboardType('numeric');
         else if (clean.length < 6) setKeyboardType('default');
         else setKeyboardType('numeric');
+    };
+
+    const openCamera = (type) => {
+        setCaptureType(type);
+        setCameraVisible(true);
+    };
+
+    const takePhoto = async () => {
+
+        if (!cameraRef.current) return;
+
+        const photo = await cameraRef.current.takePictureAsync({
+            quality: 0.6
+        });
+
+        if (captureType === 'vehicle') {
+            setVehicleImage(photo.uri);
+        } else {
+            setDriverImage(photo.uri);
+        }
+
+        setCameraVisible(false);
+    };
+
+    const handleSubmit = async () => {
+
+        if (!vehicleNumber || !driverName) {
+            Alert.alert("Missing Details", "Please fill vehicle number and driver name.");
+            return;
+        }
+
+        const data = {
+            vehicleType: selectedVehicle,
+            rate: currentRate,
+            vehicleNumber,
+            driverName,
+            phoneNumber,
+            vehicleImage,
+            driverImage
+        };
+
+        const success = await saveCheckin(data);
+
+        if (success) {
+
+            Alert.alert("Success", "Vehicle check-in saved");
+
+            navigation.navigate('HomeMain');
+
+        } else {
+            Alert.alert("Error", "Failed to save check-in");
+        }
     };
 
     if (!fontsLoaded) return null;
@@ -71,10 +133,49 @@ export default function Checkin({ navigation }) {
     return (
         <View style={styles.container}>
 
-            {/* Header */}
+            <Modal visible={cameraVisible} animationType="slide">
+
+                <View style={{ flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
+
+                    <CameraView
+                        ref={cameraRef}
+                        style={styles.passportCamera}
+                        facing="back"
+                        flash={flash}
+                    />
+
+                    <TouchableOpacity
+                        style={styles.flashBtn}
+                        onPress={() => setFlash(flash === 'off' ? 'on' : 'off')}
+                    >
+                        <MaterialCommunityIcons
+                            name={flash === 'on' ? 'flash' : 'flash-off'}
+                            size={28}
+                            color="#fff"
+                        />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.captureButton}
+                        onPress={takePhoto}
+                    >
+                        <MaterialCommunityIcons name="camera" size={32} color="#fff" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.closeCamera}
+                        onPress={() => setCameraVisible(false)}
+                    >
+                        <MaterialCommunityIcons name="close" size={28} color="#fff" />
+                    </TouchableOpacity>
+
+                </View>
+
+            </Modal>
+
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialCommunityIcons name="arrow-left" size={28} color="#000" />
+                    <MaterialCommunityIcons name="arrow-left" size={28} />
                 </TouchableOpacity>
 
                 <Text style={styles.headerTitle}>Vehicle IN Entry</Text>
@@ -84,7 +185,6 @@ export default function Checkin({ navigation }) {
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
 
-                {/* Vehicle Type */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Vehicle Type</Text>
 
@@ -122,7 +222,6 @@ export default function Checkin({ navigation }) {
                     </View>
                 </View>
 
-                {/* Rate */}
                 <View style={styles.section}>
                     <View style={styles.rateBox}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -134,7 +233,6 @@ export default function Checkin({ navigation }) {
                     </View>
                 </View>
 
-                {/* Vehicle Details */}
                 <View style={styles.section}>
 
                     <Text style={styles.inputLabel}>Vehicle Number</Text>
@@ -153,7 +251,7 @@ export default function Checkin({ navigation }) {
                         />
                     </View>
 
-                    <Text style={styles.inputLabel}>Driver Name (Optional)</Text>
+                    <Text style={styles.inputLabel}>Driver Name</Text>
 
                     <View style={styles.inputWrapper}>
                         <MaterialCommunityIcons name="account" size={24} color="#888" style={styles.inputIcon} />
@@ -183,48 +281,53 @@ export default function Checkin({ navigation }) {
 
                 </View>
 
-                {/* Images */}
                 <View style={styles.section}>
 
                     <View style={styles.imageRow}>
 
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.inputLabel}>Vehicle Image</Text>
+                        <TouchableOpacity
+                            style={styles.captureBox}
+                            onPress={() => openCamera('vehicle')}
+                        >
 
-                            <View style={styles.captureBox}>
-                                <MaterialCommunityIcons name="camera" size={32} color="#888" />
-                                <Text style={styles.captureText}>Capture</Text>
-                            </View>
-                        </View>
+                            {vehicleImage ?
+                                <Image source={{ uri: vehicleImage }} style={styles.previewImage} />
+                                :
+                                <>
+                                    <MaterialCommunityIcons name="camera" size={32} color="#888" />
+                                    <Text style={styles.captureText}>Vehicle</Text>
+                                </>
+                            }
 
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.inputLabel}>Driver Image</Text>
+                        </TouchableOpacity>
 
-                            <View style={styles.captureBox}>
-                                <MaterialCommunityIcons name="account-box" size={32} color="#888" />
-                                <Text style={styles.captureText}>Capture</Text>
-                            </View>
-                        </View>
+                        <TouchableOpacity
+                            style={styles.captureBox}
+                            onPress={() => openCamera('driver')}
+                        >
+
+                            {driverImage ?
+                                <Image source={{ uri: driverImage }} style={styles.previewImage} />
+                                :
+                                <>
+                                    <MaterialCommunityIcons name="account-box" size={32} color="#888" />
+                                    <Text style={styles.captureText}>Driver</Text>
+                                </>
+                            }
+
+                        </TouchableOpacity>
 
                     </View>
 
                 </View>
 
-                {/* Info */}
-                <View style={[styles.section, styles.infoBox]}>
-                    <MaterialCommunityIcons name="information" size={20} color="#f59e0b" />
-
-                    <Text style={styles.infoText}>
-                        Entry time will be recorded automatically upon submission.
-                        Ensure the vehicle number matches the plate for accurate billing.
-                    </Text>
-                </View>
-
             </ScrollView>
 
-            {/* Submit */}
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.submitButton}>
+                <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={handleSubmit}
+                >
                     <MaterialCommunityIcons name="login" size={24} color="#fff" />
                     <Text style={styles.submitText}>SUBMIT / VEHICLE IN</Text>
                 </TouchableOpacity>
@@ -305,6 +408,7 @@ const styles = StyleSheet.create({
     imageRow: { flexDirection: 'row', gap: 10 },
 
     captureBox: {
+        flex: 1,
         backgroundColor: '#f3f4f6',
         height: 120,
         borderRadius: 16,
@@ -313,21 +417,15 @@ const styles = StyleSheet.create({
         borderColor: '#d1d5db',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 12,
+        overflow: 'hidden'
+    },
+
+    previewImage: {
+        width: '100%',
+        height: '100%'
     },
 
     captureText: { fontSize: 12, fontWeight: '700', marginTop: 4 },
-
-    infoBox: {
-        flexDirection: 'row',
-        backgroundColor: '#f9fafb',
-        padding: 12,
-        borderRadius: 16,
-        alignItems: 'flex-start',
-        gap: 8,
-    },
-
-    infoText: { fontSize: 12, color: '#6b7280', flex: 1 },
 
     footer: {
         padding: 16,
@@ -347,5 +445,35 @@ const styles = StyleSheet.create({
     },
 
     submitText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+
+    passportCamera: {
+        width: 260,
+        height: 360,
+        borderRadius: 20,
+        overflow: 'hidden'
+    },
+
+    captureButton: {
+        position: 'absolute',
+        bottom: 60,
+        backgroundColor: '#137fec',
+        width: 70,
+        height: 70,
+        borderRadius: 40,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    flashBtn: {
+        position: 'absolute',
+        top: 60,
+        right: 30
+    },
+
+    closeCamera: {
+        position: 'absolute',
+        top: 60,
+        left: 30
+    }
 
 });
