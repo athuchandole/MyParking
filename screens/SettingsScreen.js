@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ParkingRates from '../components/ParkingRates';
+import Header from "../components/Header";
 
 export default function SettingsScreen({ navigation }) {
     const [darkMode, setDarkMode] = useState(false);
@@ -20,12 +21,10 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.container}>
 
             {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation?.goBack()}>
-                    <MaterialCommunityIcons name="arrow-left" size={26} color="#111" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Settings</Text>
-            </View>
+            <Header
+                title="Settings"
+                navigation={navigation}
+            />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
 
@@ -206,21 +205,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f6f7f8',
     },
 
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
-    },
-
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        marginLeft: 10,
-    },
 
     section: {
         marginTop: 20,

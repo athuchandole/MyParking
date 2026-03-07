@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Header from "../components/Header";
 
 export default function Checkout({ route, navigation }) {
 
@@ -27,20 +28,10 @@ export default function Checkout({ route, navigation }) {
 
                 {/* Header */}
 
-                <View style={styles.header}>
-
-                    <TouchableOpacity
-                        style={styles.backBtn}
-                        onPress={() => navigation.goBack()}
-                    >
-                        <MaterialCommunityIcons name="arrow-left" size={24} />
-                    </TouchableOpacity>
-
-                    <Text style={styles.headerTitle}>
-                        Exit Summary
-                    </Text>
-
-                </View>
+                <Header
+                    title="Exit Summary"
+                    navigation={navigation}
+                />
 
 
                 {/* Vehicle Card */}
@@ -235,29 +226,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f6f7f8'
-    },
-
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderColor: '#f1f5f9'
-    },
-
-    backBtn: {
-        height: 40,
-        width: 40,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-
-    headerTitle: {
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 18,
-        fontWeight: '700',
-        marginRight: 40
     },
 
     sectionPadding: {

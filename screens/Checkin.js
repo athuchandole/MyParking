@@ -7,6 +7,7 @@ import { getParkingRates } from '../storage/ParkingRate';
 import { saveCheckin } from '../storage/CheckinStorage';
 import { useFocusEffect } from '@react-navigation/native';
 import { CameraView } from 'expo-camera';
+import Header from "../components/Header";
 
 export default function Checkin({ navigation }) {
 
@@ -173,15 +174,11 @@ export default function Checkin({ navigation }) {
 
             </Modal>
 
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialCommunityIcons name="arrow-left" size={28} />
-                </TouchableOpacity>
-
-                <Text style={styles.headerTitle}>Vehicle IN Entry</Text>
-
-                <MaterialCommunityIcons name="history" size={28} color="#137fec" />
-            </View>
+            <Header
+                title="Vehicle IN Entry"
+                navigation={navigation}
+                rightIcon="history"
+            />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
 
@@ -340,16 +337,6 @@ export default function Checkin({ navigation }) {
 const styles = StyleSheet.create({
 
     container: { flex: 1, backgroundColor: '#f6f7f8' },
-
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        justifyContent: 'space-between',
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-    },
 
     headerTitle: { fontSize: 18, fontWeight: 'bold' },
 
