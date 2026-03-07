@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import Checkin from '../screens/Checkin';
+import Checkout from '../screens/Checkout';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ function HomeStackScreen() {
         <HomeStack.Navigator screenOptions={{ headerShown: false }}>
             <HomeStack.Screen name="HomeMain" component={HomeScreen} />
             <HomeStack.Screen name="Checkin" component={Checkin} />
+            <HomeStack.Screen name="Checkout" component={Checkout} />
         </HomeStack.Navigator>
     );
 }

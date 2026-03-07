@@ -1,9 +1,12 @@
 //Parking/components/VehicleCard.js
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function VehicleCard({ item }) {
+
+    const navigation = useNavigation();
 
     const time = new Date(item.createdAt).toLocaleTimeString([], {
         hour: '2-digit',
@@ -18,97 +21,79 @@ export default function VehicleCard({ item }) {
                 : 'car';
 
     return (
-        <View style={styles.card}>
 
-            <View style={styles.row}>
+        <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate('Checkout', { item })}
+        >
 
-                {/* Vehicle Image */}
-                <View style={styles.imageBox}>
-                    {item.vehicleImage ? (
-                        <Image
-                            source={{ uri: item.vehicleImage }}
-                            style={styles.image}
-                        />
-                    ) : (
-                        <MaterialCommunityIcons
-                            name="car"
-                            size={36}
-                            color="#94a3b8"
-                        />
-                    )}
-                </View>
+            <View style={styles.card}>
 
-                {/* Right Content */}
-                <View style={styles.content}>
+                <View style={styles.row}>
 
-                    {/* Header */}
-                    <View style={styles.header}>
+                    <View style={styles.imageBox}>
+                        {item.vehicleImage ? (
+                            <Image
+                                source={{ uri: item.vehicleImage }}
+                                style={styles.image}
+                            />
+                        ) : (
+                            <MaterialCommunityIcons
+                                name="car"
+                                size={36}
+                                color="#94a3b8"
+                            />
+                        )}
+                    </View>
 
-                        <View>
-                            <Text style={styles.vehicleNumber}>
-                                {item.vehicleNumber}
-                            </Text>
+                    <View style={styles.content}>
 
-                            <View style={styles.vehicleTypeRow}>
-                                <MaterialCommunityIcons
-                                    name={vehicleIcon}
-                                    size={15}
-                                    color="#64748b"
-                                />
-                                <Text style={styles.vehicleType}>
-                                    {item.vehicleType}
+                        <View style={styles.header}>
+
+                            <View>
+                                <Text style={styles.vehicleNumber}>
+                                    {item.vehicleNumber}
                                 </Text>
+
+                                <View style={styles.vehicleTypeRow}>
+                                    <MaterialCommunityIcons
+                                        name={vehicleIcon}
+                                        size={15}
+                                        color="#64748b"
+                                    />
+                                    <Text style={styles.vehicleType}>
+                                        {item.vehicleType}
+                                    </Text>
+                                </View>
                             </View>
+
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>Active</Text>
+                            </View>
+
                         </View>
-
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>Active</Text>
-                        </View>
-
-                    </View>
-
-                    {/* Driver */}
-                    <View style={styles.infoRow}>
-                        <MaterialCommunityIcons
-                            name="account-outline"
-                            size={16}
-                            color="#64748b"
-                        />
-                        <Text style={styles.infoText}>
-                            {item.driverName}
-                        </Text>
-                    </View>
-
-                    {/* Phone */}
-                    <View style={styles.infoRow}>
-                        <MaterialCommunityIcons
-                            name="phone-outline"
-                            size={16}
-                            color="#64748b"
-                        />
-                        <Text style={styles.infoText}>
-                            {item.phoneNumber || '-'}
-                        </Text>
-                    </View>
-
-                    {/* Bottom */}
-                    <View style={styles.bottomRow}>
 
                         <View style={styles.infoRow}>
-                            <MaterialCommunityIcons
-                                name="clock-outline"
-                                size={16}
-                                color="#64748b"
-                            />
-                            <Text style={styles.infoText}>
-                                {time}
-                            </Text>
+                            <MaterialCommunityIcons name="account-outline" size={16} color="#64748b" />
+                            <Text style={styles.infoText}>{item.driverName}</Text>
                         </View>
 
-                        <View style={styles.rate}>
-                            <Text style={styles.rateText}>
-                                ₹{item.rate}/hr
-                            </Text>
+                        <View style={styles.infoRow}>
+                            <MaterialCommunityIcons name="phone-outline" size={16} color="#64748b" />
+                            <Text style={styles.infoText}>{item.phoneNumber}</Text>
+                        </View>
+
+                        <View style={styles.bottomRow}>
+
+                            <View style={styles.infoRow}>
+                                <MaterialCommunityIcons name="clock-outline" size={16} color="#64748b" />
+                                <Text style={styles.infoText}>{time}</Text>
+                            </View>
+
+                            <View style={styles.rate}>
+                                <Text style={styles.rateText}>₹{item.rate}/hr</Text>
+                            </View>
+
                         </View>
 
                     </View>
@@ -117,7 +102,7 @@ export default function VehicleCard({ item }) {
 
             </View>
 
-        </View>
+        </TouchableOpacity>
     );
 }
 
@@ -155,21 +140,18 @@ const styles = StyleSheet.create({
 
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start'
+        justifyContent: 'space-between'
     },
 
     vehicleNumber: {
         fontSize: 18,
-        fontWeight: '700',
-        color: '#0f172a'
+        fontWeight: '700'
     },
 
     vehicleTypeRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        marginTop: 2
+        gap: 4
     },
 
     vehicleType: {
@@ -205,8 +187,7 @@ const styles = StyleSheet.create({
     bottomRow: {
         marginTop: 8,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'space-between'
     },
 
     rate: {
