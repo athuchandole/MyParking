@@ -10,6 +10,9 @@ export default function Checkin({ navigation }) {
 
     const [vehicleNumber, setVehicleNumber] = useState('');
     const [driverName, setDriverName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [keyboardType, setKeyboardType] = useState('default');
+
     const [selectedVehicle, setSelectedVehicle] = useState('bike');
     const [rates, setRates] = useState({ bike: '10', auto: '20', car: '40' });
 
@@ -39,6 +42,29 @@ export default function Checkin({ navigation }) {
     ];
 
     const currentRate = rates[selectedVehicle] || '0';
+
+    // Vehicle number formatter
+    const handleVehicleNumber = (text) => {
+
+        let clean = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+        let part1 = clean.slice(0, 2).replace(/[^A-Z]/g, '');
+        let part2 = clean.slice(2, 4).replace(/[^0-9]/g, '');
+        let part3 = clean.slice(4, 6).replace(/[^A-Z]/g, '');
+        let part4 = clean.slice(6, 10).replace(/[^0-9]/g, '');
+
+        let formatted = [part1, part2, part3, part4]
+            .filter(Boolean)
+            .join(' ');
+
+        setVehicleNumber(formatted);
+
+        // keyboard switching
+        if (clean.length < 2) setKeyboardType('default');
+        else if (clean.length < 4) setKeyboardType('numeric');
+        else if (clean.length < 6) setKeyboardType('default');
+        else setKeyboardType('numeric');
+    };
 
     if (!fontsLoaded) return null;
 
@@ -108,7 +134,7 @@ export default function Checkin({ navigation }) {
                     </View>
                 </View>
 
-                {/* Vehicle Number */}
+                {/* Vehicle Details */}
                 <View style={styles.section}>
 
                     <Text style={styles.inputLabel}>Vehicle Number</Text>
@@ -118,10 +144,12 @@ export default function Checkin({ navigation }) {
 
                         <TextInput
                             style={styles.input}
-                            placeholder="e.g. MH 12 AB 1234"
+                            placeholder="MH 12 AB 1234"
                             value={vehicleNumber}
-                            onChangeText={setVehicleNumber}
+                            onChangeText={handleVehicleNumber}
+                            keyboardType={keyboardType}
                             autoCapitalize="characters"
+                            maxLength={13}
                         />
                     </View>
 
@@ -138,23 +166,46 @@ export default function Checkin({ navigation }) {
                         />
                     </View>
 
+                    <Text style={styles.inputLabel}>Phone Number</Text>
+
+                    <View style={styles.inputWrapper}>
+                        <MaterialCommunityIcons name="phone" size={24} color="#888" style={styles.inputIcon} />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter phone number"
+                            keyboardType="phone-pad"
+                            value={phoneNumber}
+                            onChangeText={setPhoneNumber}
+                            maxLength={10}
+                        />
+                    </View>
+
                 </View>
 
                 {/* Images */}
                 <View style={styles.section}>
 
-                    <Text style={styles.inputLabel}>Vehicle Image</Text>
+                    <View style={styles.imageRow}>
 
-                    <View style={styles.captureBox}>
-                        <MaterialCommunityIcons name="camera" size={32} color="#888" />
-                        <Text style={styles.captureText}>Capture</Text>
-                    </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.inputLabel}>Vehicle Image</Text>
 
-                    <Text style={styles.inputLabel}>Driver Image</Text>
+                            <View style={styles.captureBox}>
+                                <MaterialCommunityIcons name="camera" size={32} color="#888" />
+                                <Text style={styles.captureText}>Capture</Text>
+                            </View>
+                        </View>
 
-                    <View style={styles.captureBox}>
-                        <MaterialCommunityIcons name="account-box" size={32} color="#888" />
-                        <Text style={styles.captureText}>Capture</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.inputLabel}>Driver Image</Text>
+
+                            <View style={styles.captureBox}>
+                                <MaterialCommunityIcons name="account-box" size={32} color="#888" />
+                                <Text style={styles.captureText}>Capture</Text>
+                            </View>
+                        </View>
+
                     </View>
 
                 </View>
@@ -173,12 +224,10 @@ export default function Checkin({ navigation }) {
 
             {/* Submit */}
             <View style={styles.footer}>
-
                 <TouchableOpacity style={styles.submitButton}>
                     <MaterialCommunityIcons name="login" size={24} color="#fff" />
                     <Text style={styles.submitText}>SUBMIT / VEHICLE IN</Text>
                 </TouchableOpacity>
-
             </View>
 
         </View>
@@ -252,6 +301,8 @@ const styles = StyleSheet.create({
     inputIcon: { marginRight: 8 },
 
     input: { flex: 1, fontSize: 16 },
+
+    imageRow: { flexDirection: 'row', gap: 10 },
 
     captureBox: {
         backgroundColor: '#f3f4f6',
