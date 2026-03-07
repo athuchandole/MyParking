@@ -1,9 +1,10 @@
-//screens/Checkin.js
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+// screens/Checkin.js
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { getParkingRates } from '../storage/ParkingRate';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Checkin({ navigation }) {
 
@@ -16,14 +17,20 @@ export default function Checkin({ navigation }) {
         ...MaterialCommunityIcons.font,
     });
 
-    useEffect(() => {
-        loadRates();
-    }, []);
-
     const loadRates = async () => {
         const data = await getParkingRates();
         setRates(data);
     };
+
+    useEffect(() => {
+        loadRates();
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadRates();
+        }, [])
+    );
 
     const vehicleTypes = [
         { key: 'bike', label: 'Bike', icon: 'bike' },
