@@ -1,5 +1,5 @@
 //Parking/screens/SettingsScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -12,28 +12,41 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ParkingRates from '../components/ParkingRates';
 import Header from "../components/Header";
+import { saveDefaultPlate, getDefaultPlate } from '../storage/DefaultPlateStorage';
 
 export default function SettingsScreen({ navigation }) {
     const [darkMode, setDarkMode] = useState(false);
     const [language, setLanguage] = useState('English');
+    const [defaultPart1, setDefaultPart1] = useState('');
+    const [defaultPart2, setDefaultPart2] = useState('');
+
+    useEffect(() => {
+        const loadDefaultPlate = async () => {
+            const plate = await getDefaultPlate();
+            if (plate) {
+                setDefaultPart1(plate.part1);
+                setDefaultPart2(plate.part2);
+            }
+        };
+        loadDefaultPlate();
+    }, []);
+
+    const handleSaveDefaultPlate = async () => {
+        await saveDefaultPlate({ part1: defaultPart1.toUpperCase(), part2: defaultPart2 });
+        alert('Default Plate saved!');
+    };
 
     return (
         <View style={styles.container}>
 
-            {/* Header */}
-            <Header
-                title="Settings"
-                navigation={navigation}
-            />
+            <Header title="Settings" navigation={navigation} />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
 
                 {/* Appearance */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Appearance</Text>
-
                     <View style={styles.card}>
-
                         <View style={styles.row}>
                             <View style={styles.left}>
                                 <View style={styles.iconBox}>
@@ -57,7 +70,6 @@ export default function SettingsScreen({ navigation }) {
 
                         <View style={{ padding: 14 }}>
                             <Text style={styles.smallLabel}>Primary Color Selection</Text>
-
                             <View style={styles.colorRow}>
                                 <View style={[styles.colorDot, { backgroundColor: '#137fec' }]} />
                                 <View style={[styles.colorDot, { backgroundColor: '#10b981' }]} />
@@ -66,17 +78,14 @@ export default function SettingsScreen({ navigation }) {
                                 <View style={[styles.colorDot, { backgroundColor: '#8b5cf6' }]} />
                             </View>
                         </View>
-
                     </View>
                 </View>
 
                 {/* Localization */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Localization</Text>
-
                     <View style={styles.card}>
                         <View style={styles.row}>
-
                             <View style={styles.left}>
                                 <View style={styles.iconBox}>
                                     <MaterialCommunityIcons
@@ -87,222 +96,102 @@ export default function SettingsScreen({ navigation }) {
                                 </View>
                                 <Text style={styles.label}>Language</Text>
                             </View>
-
                             <TextInput
                                 style={styles.languageInput}
                                 value={language}
                                 onChangeText={setLanguage}
                             />
-
                         </View>
+                    </View>
+                </View>
+
+                {/* Default Plate Settings */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Default Vehicle Plate</Text>
+                    <View style={styles.card}>
+                        <View style={styles.row}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.label}>Part 1 (Letters)</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={defaultPart1}
+                                    maxLength={2}
+                                    autoCapitalize="characters"
+                                    onChangeText={setDefaultPart1}
+                                    placeholder="AA"
+                                />
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 12 }}>
+                                <Text style={styles.label}>Part 2 (Numbers)</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={defaultPart2}
+                                    maxLength={2}
+                                    keyboardType="numeric"
+                                    onChangeText={setDefaultPart2}
+                                    placeholder="00"
+                                />
+                            </View>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.submitButton, { marginTop: 16 }]}
+                            onPress={handleSaveDefaultPlate}
+                        >
+                            <Text style={styles.submitText}>Save Default Plate</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Parking Rates */}
                 <View style={styles.section}>
-
                     <View style={styles.headerRow}>
-                        <Text style={styles.sectionTitle}>
-                            Parking Rates (per hour)
-                        </Text>
-
-                        <Text style={styles.editTag}>
-                            EDITABLE
-                        </Text>
+                        <Text style={styles.sectionTitle}>Parking Rates (per hour)</Text>
+                        <Text style={styles.editTag}>EDITABLE</Text>
                     </View>
-
                     <ParkingRates />
-
-                </View>
-
-                {/* Account & Security */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Account & Security</Text>
-
-                    <View style={styles.card}>
-
-                        <TouchableOpacity style={styles.buttonRow}>
-                            <View style={styles.left}>
-                                <MaterialCommunityIcons
-                                    name="lock-outline"
-                                    size={20}
-                                    color="#6b7280"
-                                />
-                                <Text style={styles.label}>Change Password</Text>
-                            </View>
-
-                            <MaterialCommunityIcons
-                                name="chevron-right"
-                                size={20}
-                                color="#9ca3af"
-                            />
-                        </TouchableOpacity>
-
-                        <View style={styles.divider} />
-
-                        <TouchableOpacity style={styles.buttonRow}>
-                            <View style={styles.left}>
-                                <MaterialCommunityIcons
-                                    name="logout"
-                                    size={20}
-                                    color="#ef4444"
-                                />
-                                <Text style={[styles.label, { color: '#ef4444' }]}>
-                                    Logout
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-
-                    </View>
-                </View>
-
-                {/* System */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>System</Text>
-
-                    <View style={styles.card}>
-
-                        <View style={styles.row}>
-                            <Text style={styles.label}>App Version</Text>
-                            <Text style={styles.version}>2.4.1-stable</Text>
-                        </View>
-
-                        <View style={styles.divider} />
-
-                        <TouchableOpacity style={styles.buttonRow}>
-                            <Text style={styles.label}>Terms of Service</Text>
-                            <MaterialCommunityIcons
-                                name="open-in-new"
-                                size={20}
-                                color="#9ca3af"
-                            />
-                        </TouchableOpacity>
-
-                        <View style={styles.divider} />
-
-                        <TouchableOpacity style={styles.buttonRow}>
-                            <Text style={styles.label}>Privacy Policy</Text>
-                            <MaterialCommunityIcons
-                                name="open-in-new"
-                                size={20}
-                                color="#9ca3af"
-                            />
-                        </TouchableOpacity>
-
-                    </View>
                 </View>
 
             </ScrollView>
-
         </View>
     );
 }
 
 const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
-        backgroundColor: '#f6f7f8',
-    },
+    container: { flex: 1, backgroundColor: '#f6f7f8' },
 
+    section: { marginTop: 20, paddingHorizontal: 16 },
 
-    section: {
-        marginTop: 20,
-        paddingHorizontal: 16,
-    },
+    sectionTitle: { fontSize: 12, fontWeight: '700', color: '#6b7280', marginBottom: 8 },
 
-    sectionTitle: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#6b7280',
-        marginBottom: 8,
-    },
+    card: { backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', padding: 12 },
 
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-    },
+    row: { flexDirection: 'row', alignItems: 'center' },
 
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 14,
-    },
+    left: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 14,
-    },
+    label: { fontSize: 15, fontWeight: '500', marginBottom: 4 },
 
-    left: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
+    divider: { height: 1, backgroundColor: '#e5e7eb', marginVertical: 8 },
 
-    label: {
-        fontSize: 15,
-        fontWeight: '500',
-    },
+    iconBox: { width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(19,127,236,0.1)', justifyContent: 'center', alignItems: 'center' },
 
-    divider: {
-        height: 1,
-        backgroundColor: '#e5e7eb',
-    },
+    smallLabel: { fontSize: 13, fontWeight: '500', marginBottom: 8 },
 
-    iconBox: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        backgroundColor: 'rgba(19,127,236,0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+    colorRow: { flexDirection: 'row', gap: 12 },
 
-    smallLabel: {
-        fontSize: 13,
-        fontWeight: '500',
-        marginBottom: 8,
-    },
+    colorDot: { width: 28, height: 28, borderRadius: 14 },
 
-    colorRow: {
-        flexDirection: 'row',
-        gap: 12,
-    },
+    languageInput: { fontWeight: '600', fontSize: 14, color: '#137fec', textAlign: 'right' },
 
-    colorDot: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-    },
+    headerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
 
-    languageInput: {
-        fontWeight: '600',
-        fontSize: 14,
-        color: '#137fec',
-        textAlign: 'right',
-    },
+    editTag: { fontSize: 10, fontWeight: '700', color: '#137fec' },
 
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
+    input: { backgroundColor: '#f3f4f6', borderRadius: 12, paddingHorizontal: 10, height: 44, borderWidth: 1, borderColor: '#d1d5db' },
 
-    editTag: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: '#137fec',
-    },
+    submitButton: { backgroundColor: '#137fec', borderRadius: 12, padding: 12, alignItems: 'center', justifyContent: 'center' },
 
-    version: {
-        color: '#9ca3af',
-        fontWeight: '600',
-    },
-
+    submitText: { color: '#fff', fontWeight: '700' }
 });
