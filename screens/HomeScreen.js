@@ -1,10 +1,11 @@
 //Parking/screens/HomeScreen.js
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Header from "../components/Header";
 import VehicleCard from "../components/VehicleCard";
+import SearchBar from "../components/SearchBar";
 import { getCheckins } from "../storage/CheckinStorage";
 
 export default function HomeScreen() {
@@ -23,11 +24,27 @@ export default function HomeScreen() {
     useFocusEffect(useCallback(() => { loadVehicles(); }, []));
 
     const filtered = list.filter(v => {
+
         const q = search.toLowerCase();
-        return v.vehicleNumber?.toLowerCase().includes(q) || v.driverName?.toLowerCase().includes(q);
+
+        const time = new Date(v.createdAt).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return (
+            v.vehicleNumber?.toLowerCase().includes(q) ||
+            v.driverName?.toLowerCase().includes(q) ||
+            v.phoneNumber?.toLowerCase().includes(q) ||
+            v.vehicleType?.toLowerCase().includes(q) ||
+            String(v.rate)?.toLowerCase().includes(q) ||
+            time?.toLowerCase().includes(q)
+        );
     });
 
-    const renderItem = ({ item }) => <VehicleCard item={item} />;
+    const renderItem = ({ item }) => (
+        <VehicleCard item={item} search={search} />
+    );
 
     return (
 
@@ -35,15 +52,7 @@ export default function HomeScreen() {
 
             <Header title="Vehicles In Parking" navigation={navigation} />
 
-            <View style={styles.searchBar}>
-                <MaterialCommunityIcons name="magnify" size={20} color="#64748b" />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search vehicle / driver"
-                    value={search}
-                    onChangeText={setSearch}
-                />
-            </View>
+            <SearchBar value={search} onChange={setSearch} />
 
             <FlatList
                 data={filtered}
@@ -59,7 +68,10 @@ export default function HomeScreen() {
             />
 
             <View style={styles.checkinBar}>
-                <TouchableOpacity style={styles.checkinBtn} onPress={() => navigation.navigate("Checkin")}>
+                <TouchableOpacity
+                    style={styles.checkinBtn}
+                    onPress={() => navigation.navigate("Checkin")}
+                >
                     <MaterialCommunityIcons name="login" size={22} color="#fff" />
                     <Text style={styles.checkinText}>Vehicle IN</Text>
                 </TouchableOpacity>
@@ -71,8 +83,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f6f7f8' },
-    searchBar: { margin: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 46 },
-    searchInput: { flex: 1, fontSize: 14, marginLeft: 6 },
     empty: { alignItems: 'center', marginTop: 80 },
     emptyText: { marginTop: 8, color: '#64748b', fontSize: 14 },
     checkinBar: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#fff', padding: 16, borderTopWidth: 1, borderColor: '#e2e8f0' },

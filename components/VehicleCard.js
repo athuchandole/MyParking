@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-export default function VehicleCard({ item }) {
+export default function VehicleCard({ item, search }) {
 
     const navigation = useNavigation();
 
@@ -19,6 +19,26 @@ export default function VehicleCard({ item }) {
             : item.vehicleType === 'auto'
                 ? 'rickshaw'
                 : 'car';
+
+    const highlight = (text) => {
+
+        if (!search) return <Text>{text}</Text>;
+
+        const q = search.toLowerCase();
+        const parts = text.toString().split(new RegExp(`(${q})`, 'gi'));
+
+        return (
+            <Text>
+                {parts.map((part, i) =>
+                    part.toLowerCase() === q ? (
+                        <Text key={i} style={styles.highlight}>{part}</Text>
+                    ) : (
+                        <Text key={i}>{part}</Text>
+                    )
+                )}
+            </Text>
+        );
+    };
 
     return (
 
@@ -52,7 +72,7 @@ export default function VehicleCard({ item }) {
 
                             <View>
                                 <Text style={styles.vehicleNumber}>
-                                    {item.vehicleNumber}
+                                    {highlight(item.vehicleNumber)}
                                 </Text>
 
                                 <View style={styles.vehicleTypeRow}>
@@ -62,7 +82,7 @@ export default function VehicleCard({ item }) {
                                         color="#64748b"
                                     />
                                     <Text style={styles.vehicleType}>
-                                        {item.vehicleType}
+                                        {highlight(item.vehicleType)}
                                     </Text>
                                 </View>
                             </View>
@@ -75,23 +95,31 @@ export default function VehicleCard({ item }) {
 
                         <View style={styles.infoRow}>
                             <MaterialCommunityIcons name="account-outline" size={16} color="#64748b" />
-                            <Text style={styles.infoText}>{item.driverName}</Text>
+                            <Text style={styles.infoText}>
+                                {highlight(item.driverName)}
+                            </Text>
                         </View>
 
                         <View style={styles.infoRow}>
                             <MaterialCommunityIcons name="phone-outline" size={16} color="#64748b" />
-                            <Text style={styles.infoText}>{item.phoneNumber}</Text>
+                            <Text style={styles.infoText}>
+                                {highlight(item.phoneNumber)}
+                            </Text>
                         </View>
 
                         <View style={styles.bottomRow}>
 
                             <View style={styles.infoRow}>
                                 <MaterialCommunityIcons name="clock-outline" size={16} color="#64748b" />
-                                <Text style={styles.infoText}>{time}</Text>
+                                <Text style={styles.infoText}>
+                                    {highlight(time)}
+                                </Text>
                             </View>
 
                             <View style={styles.rate}>
-                                <Text style={styles.rateText}>₹{item.rate}/hr</Text>
+                                <Text style={styles.rateText}>
+                                    ₹{highlight(item.rate)}
+                                </Text>
                             </View>
 
                         </View>
@@ -113,7 +141,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#e2e8f0',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        marginBottom: 12
     },
 
     row: {
@@ -201,6 +230,11 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '700',
         color: '#2563eb'
+    },
+
+    highlight: {
+        backgroundColor: '#fde047',
+        fontWeight: '700'
     }
 
 });
