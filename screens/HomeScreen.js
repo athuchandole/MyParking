@@ -6,14 +6,16 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { getCheckins } from '../storage/CheckinStorage';
 import VehicleCard from '../components/VehicleCard';
+import Header from '../components/Header';
 
 export default function HomeScreen({ navigation }) {
 
     const [vehicles, setVehicles] = useState([]);
+    const [search, setSearch] = useState("");
 
     const loadVehicles = async () => {
         const data = await getCheckins();
-        setVehicles(data);
+        setVehicles(data || []);
     };
 
     useFocusEffect(
@@ -22,49 +24,71 @@ export default function HomeScreen({ navigation }) {
         }, [])
     );
 
+    // Safe search filtering
+    const filteredVehicles = vehicles.filter(v => {
+
+        const part1 = String(v?.part1 || "");
+        const part2 = String(v?.part2 || "");
+        const plate = (part1 + part2).toLowerCase();
+
+        return plate.includes(search.toLowerCase());
+    });
+
     return (
-        <ScrollView style={styles.container}>
+        <View style={{ flex: 1 }}>
 
-            {/* Vehicle IN Button */}
+            <Header
+                navigation={navigation}
+                showBack={false}
+                showSearch={true}
+                searchValue={search}
+                onSearchChange={setSearch}
+            />
 
-            <View style={styles.actionGrid}>
+            <ScrollView style={styles.container}>
 
-                <TouchableOpacity
-                    style={styles.actionBtn}
-                    onPress={() => navigation.navigate('Checkin')}
-                >
-                    <View style={styles.iconCircle}>
-                        <MaterialCommunityIcons name="login" size={30} color="#059669" />
-                    </View>
+                {/* Vehicle IN Button */}
+                <View style={styles.actionGrid}>
 
-                    <Text style={styles.actionText}>Vehicle IN</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.actionBtn}
+                        onPress={() => navigation.navigate('Checkin')}
+                    >
+                        <View style={styles.iconCircle}>
+                            <MaterialCommunityIcons name="login" size={30} color="#059669" />
+                        </View>
 
-            </View>
+                        <Text style={styles.actionText}>
+                            Vehicle IN
+                        </Text>
+                    </TouchableOpacity>
 
-            {/* Latest Vehicles */}
+                </View>
 
-            <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>
-                    Latest Added Vehicle
-                </Text>
-            </View>
-
-            <View style={styles.vehicleList}>
-
-                {vehicles.slice(0, 5).map((item) => (
-                    <VehicleCard key={item.id} item={item} />
-                ))}
-
-                {vehicles.length === 0 && (
-                    <Text style={styles.emptyText}>
-                        No vehicles yet
+                {/* Latest Vehicles */}
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>
+                        Latest Added Vehicle
                     </Text>
-                )}
+                </View>
 
-            </View>
+                <View style={styles.vehicleList}>
 
-        </ScrollView>
+                    {filteredVehicles.slice(0, 5).map((item) => (
+                        <VehicleCard key={item.id} item={item} />
+                    ))}
+
+                    {vehicles.length === 0 && (
+                        <Text style={styles.emptyText}>
+                            No vehicles yet
+                        </Text>
+                    )}
+
+                </View>
+
+            </ScrollView>
+
+        </View>
     );
 }
 

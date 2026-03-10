@@ -1,6 +1,6 @@
-//components/Header.js
+//Parking/components/Header.js
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, TextInput } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,7 +9,10 @@ export default function Header({
     navigation,
     showBack = true,
     rightIcon = null,
-    onRightPress = null
+    onRightPress = null,
+    showSearch = false,
+    searchValue = "",
+    onSearchChange = () => { }
 }) {
 
     const insets = useSafeAreaInsets();
@@ -31,9 +34,21 @@ export default function Header({
                     <View style={styles.iconPlaceholder} />
                 )}
 
-                <Text style={styles.title}>
-                    {title}
-                </Text>
+                {!showSearch ? (
+                    <Text style={styles.title}>
+                        {title}
+                    </Text>
+                ) : (
+                    <View style={styles.searchBox}>
+                        <MaterialCommunityIcons name="magnify" size={20} color="#6b7280" />
+                        <TextInput
+                            placeholder="Search vehicle..."
+                            value={searchValue}
+                            onChangeText={onSearchChange}
+                            style={styles.searchInput}
+                        />
+                    </View>
+                )}
 
                 {rightIcon ? (
                     <TouchableOpacity
@@ -82,6 +97,22 @@ const styles = StyleSheet.create({
 
     iconPlaceholder: {
         width: 40
+    },
+
+    searchBox: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#f3f4f6",
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: 38
+    },
+
+    searchInput: {
+        flex: 1,
+        marginLeft: 6,
+        fontSize: 14
     }
 
 });
