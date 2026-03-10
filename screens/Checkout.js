@@ -21,19 +21,27 @@ export default function Checkout({ route, navigation }) {
 
     const amount = totalHours * item.rate;
 
+    const goHome = () => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }]
+        });
+    };
+
     const confirmExit = async () => {
 
         if (item.status === "inactive") {
             Alert.alert("Vehicle already checked out");
-            navigation.navigate("HomeMain");
+            goHome();
             return;
         }
 
         const success = await checkoutVehicle(item.id);
 
         if (success) {
-            Alert.alert("Success", "Vehicle marked OUT");
-            navigation.navigate("HomeMain");
+            Alert.alert("Success", "Vehicle marked OUT", [
+                { text: "OK", onPress: goHome }
+            ]);
         } else {
             Alert.alert("Error", "Checkout failed");
         }
