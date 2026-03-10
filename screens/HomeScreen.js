@@ -1,151 +1,81 @@
 //Parking/screens/HomeScreen.js
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useCallback } from "react";
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import Header from "../components/Header";
+import VehicleCard from "../components/VehicleCard";
+import { getCheckins } from "../storage/CheckinStorage";
 
-import { getCheckins } from '../storage/CheckinStorage';
-import VehicleCard from '../components/VehicleCard';
-import Header from '../components/Header';
+export default function HomeScreen() {
 
-export default function HomeScreen({ navigation }) {
+    const navigation = useNavigation();
 
-    const [vehicles, setVehicles] = useState([]);
+    const [list, setList] = useState([]);
     const [search, setSearch] = useState("");
 
     const loadVehicles = async () => {
         const data = await getCheckins();
-        setVehicles(data || []);
+        const active = data.filter(v => v.status === "active");
+        setList(active);
     };
 
-    useFocusEffect(
-        useCallback(() => {
-            loadVehicles();
-        }, [])
-    );
+    useFocusEffect(useCallback(() => { loadVehicles(); }, []));
 
-    // Safe search filtering
-    const filteredVehicles = vehicles.filter(v => {
-
-        const part1 = String(v?.part1 || "");
-        const part2 = String(v?.part2 || "");
-        const plate = (part1 + part2).toLowerCase();
-
-        return plate.includes(search.toLowerCase());
+    const filtered = list.filter(v => {
+        const q = search.toLowerCase();
+        return v.vehicleNumber?.toLowerCase().includes(q) || v.driverName?.toLowerCase().includes(q);
     });
 
-    return (
-        <View style={{ flex: 1 }}>
+    const renderItem = ({ item }) => <VehicleCard item={item} />;
 
-            <Header
-                navigation={navigation}
-                showBack={false}
-                showSearch={true}
-                searchValue={search}
-                onSearchChange={setSearch}
+    return (
+
+        <View style={styles.container}>
+
+            <Header title="Vehicles In Parking" navigation={navigation} />
+
+            <View style={styles.searchBar}>
+                <MaterialCommunityIcons name="magnify" size={20} color="#64748b" />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search vehicle / driver"
+                    value={search}
+                    onChangeText={setSearch}
+                />
+            </View>
+
+            <FlatList
+                data={filtered}
+                keyExtractor={item => item.id}
+                renderItem={renderItem}
+                contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+                ListEmptyComponent={
+                    <View style={styles.empty}>
+                        <MaterialCommunityIcons name="parking" size={46} color="#94a3b8" />
+                        <Text style={styles.emptyText}>No Active Vehicles</Text>
+                    </View>
+                }
             />
 
-            <ScrollView style={styles.container}>
-
-                {/* Vehicle IN Button */}
-                <View style={styles.actionGrid}>
-
-                    <TouchableOpacity
-                        style={styles.actionBtn}
-                        onPress={() => navigation.navigate('Checkin')}
-                    >
-                        <View style={styles.iconCircle}>
-                            <MaterialCommunityIcons name="login" size={30} color="#059669" />
-                        </View>
-
-                        <Text style={styles.actionText}>
-                            Vehicle IN
-                        </Text>
-                    </TouchableOpacity>
-
-                </View>
-
-                {/* Latest Vehicles */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>
-                        Latest Added Vehicle
-                    </Text>
-                </View>
-
-                <View style={styles.vehicleList}>
-
-                    {filteredVehicles.slice(0, 5).map((item) => (
-                        <VehicleCard key={item.id} item={item} />
-                    ))}
-
-                    {vehicles.length === 0 && (
-                        <Text style={styles.emptyText}>
-                            No vehicles yet
-                        </Text>
-                    )}
-
-                </View>
-
-            </ScrollView>
+            <View style={styles.checkinBar}>
+                <TouchableOpacity style={styles.checkinBtn} onPress={() => navigation.navigate("Checkin")}>
+                    <MaterialCommunityIcons name="login" size={22} color="#fff" />
+                    <Text style={styles.checkinText}>Vehicle IN</Text>
+                </TouchableOpacity>
+            </View>
 
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        backgroundColor: '#f8fafc',
-        padding: 16
-    },
-
-    actionGrid: {
-        flexDirection: 'row',
-        marginBottom: 18
-    },
-
-    actionBtn: {
-        flex: 1,
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-        alignItems: 'center'
-    },
-
-    iconCircle: {
-        height: 56,
-        width: 56,
-        borderRadius: 28,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#d1fae5'
-    },
-
-    actionText: {
-        marginTop: 10,
-        fontWeight: '700'
-    },
-
-    sectionHeader: {
-        marginBottom: 10
-    },
-
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold'
-    },
-
-    vehicleList: {
-        gap: 12
-    },
-
-    emptyText: {
-        textAlign: 'center',
-        color: '#6b7280',
-        marginTop: 20
-    }
-
+    container: { flex: 1, backgroundColor: '#f6f7f8' },
+    searchBar: { margin: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 46 },
+    searchInput: { flex: 1, fontSize: 14, marginLeft: 6 },
+    empty: { alignItems: 'center', marginTop: 80 },
+    emptyText: { marginTop: 8, color: '#64748b', fontSize: 14 },
+    checkinBar: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#fff', padding: 16, borderTopWidth: 1, borderColor: '#e2e8f0' },
+    checkinBtn: { backgroundColor: '#137fec', height: 54, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+    checkinText: { color: '#fff', fontSize: 16, fontWeight: '700' }
 });
