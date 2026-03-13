@@ -26,25 +26,25 @@ export default function ShareOnWhatsApp({ item }) {
             const message =
                 `🚗 PARKING RECEIPT
 
-Vehicle : ${item.vehicleNumber}
-Driver  : ${item.driverName}
-Type    : ${item.vehicleType}
+*Vehicle No* : ${item.vehicleNumber}
+*Driver Name* : ${item.driverName}
+*Type* : ${item.vehicleType}
+*Rate/hr* : ₹${item.rate}
 
 Entry Time : ${entry.toLocaleString()}
-
 ${isActive
-                    ? `Status     : ACTIVE PARKING
-Current Time: ${exit.toLocaleString()}`
-                    : `Exit Time  : ${exit.toLocaleString()}
-Status     : VEHICLE EXITED`
+                    ? `Current Time : ${exit.toLocaleString()}
+
+*Status : ACTIVE PARKING*`
+                    : `Exit Time : ${exit.toLocaleString()}
+
+*Status : VEHICLE EXITED*`
                 }
 
-Duration : ${hrs}h ${mins}m
-Rate/hr  : ₹${item.rate}
-
+Duration : *${hrs}h ${mins}m*
 Billable Hours : ${totalHours}
 
-Total Amount : ₹${amount}
+*Total Amount : ₹${amount}*
 
 Thank you for visiting 🙏`;
 
@@ -60,7 +60,6 @@ Thank you for visiting 🙏`;
 
             } else {
 
-                // fallback if no phone
                 url = `whatsapp://send?text=${encodeURIComponent(message)}`;
 
             }
@@ -72,9 +71,7 @@ Thank you for visiting 🙏`;
                 await Linking.openURL(url);
 
             } else {
-
                 Alert.alert("WhatsApp not installed");
-
             }
 
         } catch (e) {
