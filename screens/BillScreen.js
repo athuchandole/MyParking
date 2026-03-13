@@ -22,9 +22,7 @@ export default function BillScreen({ route, navigation }) {
 
     return (
         <View style={styles.container}>
-
             <Header title="Parking Bill" navigation={navigation} />
-
             <ScrollView>
 
                 {/* Images Row */}
@@ -48,14 +46,17 @@ export default function BillScreen({ route, navigation }) {
                 {/* Vehicle Info Card */}
                 <View style={styles.section}>
                     <View style={styles.infoCard}>
-                        <View style={styles.nameRow}>
-                            <Text style={styles.driverNameLarge}>{item.driverName}</Text>
-                            <Text style={styles.vehicleNumberLarge}>{item.vehicleNumber}</Text>
+                        <Text style={styles.driverName}>{item.driverName}</Text>
+                        <View style={styles.numberPlate}>
+                            <Text style={styles.vehicleNumber}>{item.vehicleNumber}</Text>
                         </View>
-                        <View style={styles.infoDetails}>
-                            <Text style={styles.vehicleType}>{item.vehicleType}</Text>
-                            <Text style={styles.entryTime}>Entry: {entry.toLocaleString()}</Text>
-                            <Text style={styles.entryTime}>Exit: {exit.toLocaleString()}</Text>
+                        <View style={styles.vehicleTypeRow}>
+                            <MaterialCommunityIcons name="car" size={20} color="#137fec" />
+                            <Text style={styles.vehicleTypeText}>{item.vehicleType}</Text>
+                        </View>
+                        <View style={styles.infoTimes}>
+                            <Text style={styles.timeText}>Entry: {entry.toLocaleString()}</Text>
+                            <Text style={styles.timeText}>Exit: {exit.toLocaleString()}</Text>
                         </View>
                     </View>
                 </View>
@@ -64,13 +65,11 @@ export default function BillScreen({ route, navigation }) {
                 <View style={styles.section}>
                     <View style={styles.receipt}>
                         <Text style={styles.title}>PARKING RECEIPT</Text>
-
                         <Row icon="login" label="Entry Time" value={entry.toLocaleString()} />
                         <Row icon="logout" label="Exit Time" value={exit.toLocaleString()} />
                         <Row icon="clock-outline" label="Duration" value={`${hrs}h ${mins}m`} highlight />
                         <Row icon="calculator" label="Billable Hours" value={`${totalHours} hr`} />
                         <Row icon="cash" label="Rate / Hour" value={`₹${item.rate}`} />
-
                         <View style={styles.amountBox}>
                             <View>
                                 <Text style={styles.amountLabel}>Total Amount</Text>
@@ -81,7 +80,6 @@ export default function BillScreen({ route, navigation }) {
                     </View>
                 </View>
 
-                {/* Share Button */}
                 <View style={{ padding: 16 }}>
                     <ShareOnWhatsApp item={item} />
                 </View>
@@ -107,7 +105,6 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#f6f7f8" },
     section: { padding: 16 },
 
-    // Images row
     imageRow: { flexDirection: 'row', gap: 12 },
     imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden' },
     fullImage: { width: '100%', height: '100%' },
@@ -122,16 +119,15 @@ const styles = StyleSheet.create({
     },
     imageLabelText: { fontSize: 11, fontWeight: '700', color: '#137fec' },
 
-    // Vehicle info card
-    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0" },
-    nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-    driverNameLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
-    vehicleNumberLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
-    infoDetails: { marginBottom: 12 },
-    vehicleType: { fontSize: 16, fontWeight: '700', color: '#64748b', marginBottom: 4 },
-    entryTime: { fontSize: 14, color: '#64748b' },
+    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0", shadowColor: '#000', shadowOpacity: 0.08, shadowOffset: { width: 0, height: 4 }, shadowRadius: 8, elevation: 3 },
+    driverName: { fontSize: 20, fontWeight: '900', color: '#111', marginBottom: 8 },
+    numberPlate: { backgroundColor: '#f0f0f0', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 8, alignSelf: 'flex-start' },
+    vehicleNumber: { fontSize: 16, fontWeight: '700', letterSpacing: 2 },
+    vehicleTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+    vehicleTypeText: { fontSize: 16, fontWeight: '600', color: '#137fec' },
+    infoTimes: {},
+    timeText: { fontSize: 14, color: '#64748b', marginBottom: 2 },
 
-    // Receipt
     receipt: { backgroundColor: "#fff", borderRadius: 14, padding: 18, borderWidth: 2, borderStyle: "dashed", borderColor: "#e2e8f0" },
     title: { fontSize: 11, fontWeight: "800", color: "#94a3b8", marginBottom: 16, letterSpacing: 1 },
     row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 14 },

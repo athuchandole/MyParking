@@ -15,43 +15,31 @@ export default function Checkout({ route, navigation }) {
     const endTime = item.checkoutAt ? new Date(item.checkoutAt) : new Date();
 
     const diff = endTime - entryTime;
-
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
     const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
-
     const ratePerHour = item.rate || 0;
     const amount = totalHours * ratePerHour;
 
     const goHome = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "Home" }]
-        });
+        navigation.reset({ index: 0, routes: [{ name: "Home" }] });
     };
 
     const confirmExit = async () => {
-
         if (item.status === "inactive") {
             Alert.alert("Vehicle already checked out");
             goHome();
             return;
         }
-
         const success = await checkoutVehicle(item.id);
-
         if (success) {
-            Alert.alert("Success", "Vehicle marked OUT", [
-                { text: "OK", onPress: goHome }
-            ]);
+            Alert.alert("Success", "Vehicle marked OUT", [{ text: "OK", onPress: goHome }]);
         } else {
             Alert.alert("Error", "Checkout failed");
         }
     };
 
     const pulseAnim = useRef(new Animated.Value(0)).current;
-
     useEffect(() => {
         Animated.loop(
             Animated.sequence([
@@ -62,143 +50,96 @@ export default function Checkout({ route, navigation }) {
     }, []);
 
     const pulseStyle = {
-        transform: [
-            {
-                scale: pulseAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [1, 1.5]
-                })
-            }
-        ],
-        opacity: pulseAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, 0.5]
-        })
+        transform: [{ scale: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.5] }) }],
+        opacity: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.5] })
     };
 
     return (
-
         <View style={styles.container}>
-
             <ScrollView>
-
                 <Header title="Exit Summary" navigation={navigation} />
 
                 {/* Images Row */}
                 <View style={styles.sectionPadding}>
-
                     <View style={styles.imageRow}>
-
                         <View style={styles.imageBox}>
                             <Image source={{ uri: item.driverImage }} style={styles.fullImage} />
                             <View style={styles.imageLabel}>
                                 <Text style={styles.imageLabelText}>DRIVER</Text>
                             </View>
                         </View>
-
                         <View style={styles.imageBox}>
                             <Image source={{ uri: item.vehicleImage }} style={styles.fullImage} />
                             <View style={styles.imageLabel}>
                                 <Text style={styles.imageLabelText}>{item.vehicleType}</Text>
                             </View>
                         </View>
-
                     </View>
-
                 </View>
 
                 {/* Vehicle Info Card */}
                 <View style={styles.sectionPadding}>
                     <View style={styles.infoCard}>
-
-                        <View style={styles.nameRow}>
-                            <Text style={styles.driverNameLarge}>{item.driverName}</Text>
-                            <Text style={styles.vehicleNumberLarge}>{item.vehicleNumber}</Text>
+                        <Text style={styles.driverName}>{item.driverName}</Text>
+                        <View style={styles.numberPlate}>
+                            <Text style={styles.vehicleNumber}>{item.vehicleNumber}</Text>
                         </View>
-
-                        <View style={styles.infoDetails}>
-                            <Text style={styles.vehicleType}>{item.vehicleType}</Text>
-                            <Text style={styles.entryTime}>{entryTime.toLocaleString()}</Text>
+                        <View style={styles.vehicleTypeRow}>
+                            <MaterialCommunityIcons name="car" size={20} color="#137fec" />
+                            <Text style={styles.vehicleTypeText}>{item.vehicleType}</Text>
                         </View>
-
+                        <Text style={styles.entryTime}>{entryTime.toLocaleString()}</Text>
                         <View style={styles.statusRow}>
-                            {item.status === "active" &&
-                                <Animated.View style={[styles.activeDot, pulseStyle]} />
-                            }
+                            {item.status === "active" && <Animated.View style={[styles.activeDot, pulseStyle]} />}
                             <Text style={[styles.statusText, item.status === "active" ? styles.activeText : styles.inactiveText]}>
                                 {item.status === "active" ? "ACTIVE PARKING" : "VEHICLE EXITED"}
                             </Text>
                         </View>
-
                     </View>
                 </View>
 
                 <ShareOnWhatsApp item={item} />
 
-                {/* Parking Receipt */}
+                {/* Receipt */}
                 <View style={styles.sectionPadding}>
-
                     <View style={styles.receiptCard}>
-
                         <Text style={styles.receiptTitle}>PARKING RECEIPT</Text>
-
                         <ReceiptRow icon="login" label="Entry Time" value={entryTime.toLocaleString()} />
-
                         <View style={styles.divider} />
-
                         <ReceiptRow icon="clock-outline" label="Parking Duration" value={`${hours}h ${minutes}m`} highlight />
-
                         <ReceiptRow icon="cash" label="Rate / Hour" value={`₹${ratePerHour}`} />
-
                         <ReceiptRow icon="calculator" label="Billable Hours" value={`${totalHours} hr`} />
-
                         <View style={styles.divider} />
-
                         <View style={styles.amountBox}>
-
                             <View>
                                 <Text style={styles.amountLabel}>Total Amount</Text>
                                 <Text style={styles.amountValue}>₹{amount}</Text>
                             </View>
-
                             <Text style={styles.gstText}>Incl. 18% GST</Text>
-
                         </View>
-
                     </View>
-
                 </View>
 
                 {/* Info Box */}
                 <View style={styles.sectionPadding}>
-
                     <View style={styles.infoBox}>
-
                         <MaterialCommunityIcons name="information-outline" size={22} color="#b45309" />
-
                         <Text style={styles.infoText}>
                             Once confirmed, the vehicle will be marked as exited and billing will stop.
                         </Text>
-
                     </View>
-
                 </View>
 
             </ScrollView>
 
             {/* Bottom Button */}
             <View style={styles.bottomBar}>
-
-
                 <TouchableOpacity style={styles.exitBtn} onPress={confirmExit}>
                     <MaterialCommunityIcons name="gate" size={22} color="#fff" />
                     <Text style={styles.exitText}>Confirm Vehicle OUT</Text>
                 </TouchableOpacity>
-
             </View>
-
         </View>
-
     );
 }
 
@@ -215,57 +156,29 @@ function ReceiptRow({ icon, label, value, highlight }) {
 }
 
 const styles = StyleSheet.create({
-
     container: { flex: 1, backgroundColor: '#f6f7f8' },
     sectionPadding: { padding: 16 },
 
     imageRow: { flexDirection: 'row', gap: 12 },
     imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden' },
     fullImage: { width: '100%', height: '100%' },
-    imageLabel: {
-        position: 'absolute',
-        bottom: 10,
-        left: 10,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 6
-    },
+    imageLabel: { position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
     imageLabelText: { fontSize: 11, fontWeight: '700', color: '#137fec' },
 
-    infoCard: {
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 8,
-        elevation: 4
-    },
-
-    nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-    driverNameLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
-    vehicleNumberLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
-
-    infoDetails: { marginBottom: 12 },
-    vehicleType: { fontSize: 16, fontWeight: '700', color: '#64748b', marginBottom: 4 },
-    entryTime: { fontSize: 14, color: '#64748b' },
-
+    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0", shadowColor: '#000', shadowOpacity: 0.08, shadowOffset: { width: 0, height: 4 }, shadowRadius: 8, elevation: 3 },
+    driverName: { fontSize: 20, fontWeight: '900', color: '#111', marginBottom: 8 },
+    numberPlate: { backgroundColor: '#f0f0f0', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 8, alignSelf: 'flex-start' },
+    vehicleNumber: { fontSize: 16, fontWeight: '700', letterSpacing: 2 },
+    vehicleTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+    vehicleTypeText: { fontSize: 16, fontWeight: '600', color: '#137fec' },
+    entryTime: { fontSize: 14, color: '#64748b', marginBottom: 6 },
     statusRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     activeDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#22c55e' },
     statusText: { fontWeight: '700', fontSize: 13 },
     activeText: { color: '#16a34a' },
     inactiveText: { color: '#dc2626' },
 
-    receiptCard: {
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        padding: 18,
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: '#e2e8f0'
-    },
+    receiptCard: { backgroundColor: '#fff', borderRadius: 14, padding: 18, borderWidth: 2, borderStyle: 'dashed', borderColor: '#e2e8f0' },
     receiptTitle: { fontSize: 11, fontWeight: '800', color: '#94a3b8', marginBottom: 16, letterSpacing: 1 },
     receiptRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 14 },
     rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -283,5 +196,4 @@ const styles = StyleSheet.create({
     bottomBar: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#fff', padding: 16, borderTopWidth: 1, borderColor: '#f1f5f9' },
     exitBtn: { height: 56, backgroundColor: '#dc2626', borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
     exitText: { color: '#fff', fontSize: 17, fontWeight: '800' }
-
 });

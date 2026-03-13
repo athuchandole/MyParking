@@ -50,7 +50,7 @@ export default function HomeScreen() {
 
         <View style={styles.container}>
 
-            <Header title="Vehicles In Parking" navigation={navigation} />
+            <Header title="Vehicles In Parking" x />
 
             <SearchBar value={search} onChange={setSearch} />
 
