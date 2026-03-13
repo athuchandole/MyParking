@@ -12,6 +12,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import Checkin from '../screens/Checkin';
 import Checkout from '../screens/Checkout';
 import BillScreen from '../screens/BillScreen';
+import EditMessageScreen from '../screens/EditMessageScreen';
 
 const Tab = createBottomTabNavigator();
 const RootStack = createNativeStackNavigator();
@@ -50,6 +51,11 @@ function HomeStackScreen() {
             <RootStack.Screen
                 name="BillScreen"
                 component={BillScreen}
+            />
+
+            <RootStack.Screen
+                name="EditMessage"
+                component={EditMessageScreen}
             />
 
         </RootStack.Navigator>
@@ -93,6 +99,42 @@ function DashboardStackScreen() {
                 component={BillScreen}
             />
 
+            <RootStack.Screen
+                name="EditMessage"
+                component={EditMessageScreen}
+            />
+
+        </RootStack.Navigator>
+
+    );
+}
+
+/* -------------------------------------------------------
+   SETTINGS STACK
+------------------------------------------------------- */
+
+function SettingsStackScreen() {
+
+    return (
+
+        <RootStack.Navigator
+            screenOptions={{
+                headerShown: false,
+                animation: "slide_from_right",
+                gestureEnabled: true
+            }}
+        >
+
+            <RootStack.Screen
+                name="SettingsMain"
+                component={SettingsScreen}
+            />
+
+            <RootStack.Screen
+                name="EditMessage"
+                component={EditMessageScreen}
+            />
+
         </RootStack.Navigator>
 
     );
@@ -104,7 +146,7 @@ function DashboardStackScreen() {
 
 export default function BottomTabs() {
 
-    const insets = useSafeAreaInsets(); // 👈 system navigation height
+    const insets = useSafeAreaInsets();
 
     return (
 
@@ -166,7 +208,7 @@ export default function BottomTabs() {
 
             <Tab.Screen
                 name="Settings"
-                component={SettingsScreen}
+                component={SettingsStackScreen}
             />
 
         </Tab.Navigator>

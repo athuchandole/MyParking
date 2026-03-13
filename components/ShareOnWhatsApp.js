@@ -1,10 +1,25 @@
-//Parking/components/ShareOnWhatsApp.js
+// Parking/components/ShareOnWhatsApp.js
 
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Linking, Alert } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getMessageTemplates } from "../storage/MessageTemplateStorage";
 
 export default function ShareOnWhatsApp({ item }) {
+
+    const replaceVars = (template, data) => {
+
+        let msg = template;
+
+        Object.keys(data).forEach(key => {
+
+            msg = msg.replaceAll(`@${key}`, data[key] ?? "");
+
+        });
+
+        return msg;
+
+    };
 
     const shareBill = async () => {
 
@@ -21,32 +36,32 @@ export default function ShareOnWhatsApp({ item }) {
             const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
             const amount = totalHours * (item.rate || 0);
 
+            const duration = `${hrs}h ${mins}m`;
+
+            const templates = await getMessageTemplates();
+
             const isActive = item.status === "active";
 
-            const message =
-                `🚗 PARKING RECEIPT
+            const data = {
 
-*Vehicle No* : ${item.vehicleNumber}
-*Driver Name* : ${item.driverName}
-*Type* : ${item.vehicleType}
-*Rate/hr* : ₹${item.rate}
+                vehicleNumber: item.vehicleNumber,
+                driverName: item.driverName,
+                phoneNumber: item.phoneNumber || "",
+                vehicleType: item.vehicleType,
+                rate: item.rate,
 
-Entry Time : ${entry.toLocaleString()}
-${isActive
-                    ? `Current Time : ${exit.toLocaleString()}
+                entryTime: entry.toLocaleString(),
+                exitTime: exit.toLocaleString(),
 
-*Status : ACTIVE PARKING*`
-                    : `Exit Time : ${exit.toLocaleString()}
+                duration: duration,
+                billableHours: totalHours,
+                amount: amount
 
-*Status : VEHICLE EXITED*`
-                }
+            };
 
-Duration : *${hrs}h ${mins}m*
-Billable Hours : ${totalHours}
+            const template = isActive ? templates.active : templates.inactive;
 
-*Total Amount : ₹${amount}*
-
-Thank you for visiting 🙏`;
+            const message = replaceVars(template, data);
 
             let phone = item.phoneNumber ? item.phoneNumber.replace(/[^0-9]/g, "") : "";
 
@@ -71,7 +86,9 @@ Thank you for visiting 🙏`;
                 await Linking.openURL(url);
 
             } else {
+
                 Alert.alert("WhatsApp not installed");
+
             }
 
         } catch (e) {

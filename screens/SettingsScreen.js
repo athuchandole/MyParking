@@ -184,6 +184,42 @@ export default function SettingsScreen({ navigation }) {
                     <ParkingRates />
                 </View>
 
+                {/* WhatsApp Message */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>WhatsApp Message</Text>
+
+                    <View style={styles.card}>
+
+                        <TouchableOpacity
+                            style={styles.row}
+                            onPress={() => navigation.navigate("EditMessage")}
+                        >
+
+                            <View style={styles.left}>
+
+                                <View style={styles.iconBox}>
+                                    <MaterialCommunityIcons
+                                        name="whatsapp"
+                                        size={20}
+                                        color="#137fec"
+                                    />
+                                </View>
+
+                                <Text style={styles.label}>Edit WhatsApp Message</Text>
+
+                            </View>
+
+                            <MaterialCommunityIcons
+                                name="chevron-right"
+                                size={22}
+                                color="#94a3b8"
+                            />
+
+                        </TouchableOpacity>
+
+                    </View>
+                </View>
+
             </ScrollView>
         </View>
     );
