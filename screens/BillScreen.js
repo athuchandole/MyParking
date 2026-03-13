@@ -1,4 +1,5 @@
 //Parking/screens/BillScreen.js
+
 import React from "react";
 import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,74 +21,72 @@ export default function BillScreen({ route, navigation }) {
     const amount = totalHours * item.rate;
 
     return (
-
         <View style={styles.container}>
 
             <Header title="Parking Bill" navigation={navigation} />
 
             <ScrollView>
 
+                {/* Images Row */}
                 <View style={styles.section}>
-
-                    <View style={styles.vehicleCard}>
-
-                        <Image source={{ uri: item.vehicleImage }} style={styles.vehicleImage} />
-
-                        <View style={styles.overlay}>
-                            <Text style={styles.overlayText}>{item.vehicleType}</Text>
-                        </View>
-
-                        <View style={styles.details}>
-
-                            <View>
-                                <Text style={styles.number}>{item.vehicleNumber}</Text>
-
-                                <View style={styles.driverRow}>
-                                    <Image source={{ uri: item.driverImage }} style={styles.driverImage} />
-                                    <Text style={styles.driver}>{item.driverName}</Text>
-                                </View>
-
+                    <View style={styles.imageRow}>
+                        <View style={styles.imageBox}>
+                            <Image source={{ uri: item.driverImage }} style={styles.fullImage} />
+                            <View style={styles.imageLabel}>
+                                <Text style={styles.imageLabelText}>DRIVER</Text>
                             </View>
-
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>INACTIVE</Text>
-                            </View>
-
                         </View>
-
+                        <View style={styles.imageBox}>
+                            <Image source={{ uri: item.vehicleImage }} style={styles.fullImage} />
+                            <View style={styles.imageLabel}>
+                                <Text style={styles.imageLabelText}>{item.vehicleType}</Text>
+                            </View>
+                        </View>
                     </View>
-
                 </View>
 
+                {/* Vehicle Info Card */}
                 <View style={styles.section}>
+                    <View style={styles.infoCard}>
+                        <View style={styles.nameRow}>
+                            <Text style={styles.driverNameLarge}>{item.driverName}</Text>
+                            <Text style={styles.vehicleNumberLarge}>{item.vehicleNumber}</Text>
+                        </View>
+                        <View style={styles.infoDetails}>
+                            <Text style={styles.vehicleType}>{item.vehicleType}</Text>
+                            <Text style={styles.entryTime}>Entry: {entry.toLocaleString()}</Text>
+                            <Text style={styles.entryTime}>Exit: {exit.toLocaleString()}</Text>
+                        </View>
+                    </View>
+                </View>
 
+                {/* Receipt */}
+                <View style={styles.section}>
                     <View style={styles.receipt}>
-
                         <Text style={styles.title}>PARKING RECEIPT</Text>
 
                         <Row icon="login" label="Entry Time" value={entry.toLocaleString()} />
                         <Row icon="logout" label="Exit Time" value={exit.toLocaleString()} />
-
-                        <View style={styles.divider} />
-
                         <Row icon="clock-outline" label="Duration" value={`${hrs}h ${mins}m`} highlight />
+                        <Row icon="calculator" label="Billable Hours" value={`${totalHours} hr`} />
+                        <Row icon="cash" label="Rate / Hour" value={`₹${item.rate}`} />
 
                         <View style={styles.amountBox}>
                             <View>
                                 <Text style={styles.amountLabel}>Total Amount</Text>
-                                <Text style={styles.amount}>₹{amount}.00</Text>
+                                <Text style={styles.amount}>₹{amount}</Text>
                             </View>
                             <Text style={styles.gst}>Incl. GST</Text>
                         </View>
-
                     </View>
-
                 </View>
+
+                {/* Share Button */}
                 <View style={{ padding: 16 }}>
                     <ShareOnWhatsApp item={item} />
                 </View>
-            </ScrollView>
 
+            </ScrollView>
         </View>
     );
 }
@@ -107,23 +106,37 @@ function Row({ icon, label, value, highlight }) {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#f6f7f8" },
     section: { padding: 16 },
-    vehicleCard: { backgroundColor: "#fff", borderRadius: 14, overflow: "hidden", borderWidth: 1, borderColor: "#e2e8f0" },
-    vehicleImage: { width: "100%", height: 180 },
-    overlay: { position: "absolute", bottom: 10, left: 10, backgroundColor: "rgba(255,255,255,0.9)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-    overlayText: { fontSize: 11, fontWeight: "700", color: "#137fec" },
-    details: { flexDirection: "row", justifyContent: "space-between", padding: 14 },
-    number: { fontSize: 20, fontWeight: "800" },
-    driverRow: { flexDirection: "row", alignItems: "center", marginTop: 6 },
-    driverImage: { width: 32, height: 32, borderRadius: 20, marginRight: 8 },
-    driver: { fontSize: 14, color: "#64748b" },
-    badge: { backgroundColor: "#fee2e2", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-    badgeText: { color: "#dc2626", fontWeight: "700", fontSize: 12 },
+
+    // Images row
+    imageRow: { flexDirection: 'row', gap: 12 },
+    imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden' },
+    fullImage: { width: '100%', height: '100%' },
+    imageLabel: {
+        position: 'absolute',
+        bottom: 10,
+        left: 10,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6
+    },
+    imageLabelText: { fontSize: 11, fontWeight: '700', color: '#137fec' },
+
+    // Vehicle info card
+    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0" },
+    nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+    driverNameLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
+    vehicleNumberLarge: { fontSize: 22, fontWeight: '900', color: '#111' },
+    infoDetails: { marginBottom: 12 },
+    vehicleType: { fontSize: 16, fontWeight: '700', color: '#64748b', marginBottom: 4 },
+    entryTime: { fontSize: 14, color: '#64748b' },
+
+    // Receipt
     receipt: { backgroundColor: "#fff", borderRadius: 14, padding: 18, borderWidth: 2, borderStyle: "dashed", borderColor: "#e2e8f0" },
     title: { fontSize: 11, fontWeight: "800", color: "#94a3b8", marginBottom: 16, letterSpacing: 1 },
     row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 14 },
     label: { fontSize: 14, color: "#64748b" },
     value: { fontWeight: "600" },
-    divider: { borderTopWidth: 1, borderColor: "#e2e8f0", marginVertical: 10 },
     amountBox: { marginTop: 20, borderTopWidth: 1, borderColor: "#e2e8f0", paddingTop: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
     amountLabel: { fontSize: 12, color: "#64748b" },
     amount: { fontSize: 32, fontWeight: "900" },
