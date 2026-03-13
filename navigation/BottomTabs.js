@@ -1,8 +1,10 @@
-//Parking/navigation/BottomTabs.js
+// Parking/navigation/BottomTabs.js
+
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import HomeScreen from '../screens/HomeScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -76,7 +78,6 @@ function DashboardStackScreen() {
                 component={DashboardScreen}
             />
 
-            {/* Needed for edit mode */}
             <RootStack.Screen
                 name="Checkin"
                 component={Checkin}
@@ -103,6 +104,8 @@ function DashboardStackScreen() {
 
 export default function BottomTabs() {
 
+    const insets = useSafeAreaInsets(); // 👈 system navigation height
+
     return (
 
         <Tab.Navigator
@@ -115,8 +118,8 @@ export default function BottomTabs() {
                 tabBarInactiveTintColor: '#64748b',
 
                 tabBarStyle: {
-                    height: 60,
-                    paddingBottom: 6,
+                    height: 60 + insets.bottom,
+                    paddingBottom: insets.bottom,
                     paddingTop: 6
                 },
 
@@ -165,6 +168,7 @@ export default function BottomTabs() {
                 name="Settings"
                 component={SettingsScreen}
             />
+
         </Tab.Navigator>
 
     );
