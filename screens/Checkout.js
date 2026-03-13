@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert, Ani
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from "../components/Header";
 import { checkoutVehicle } from "../storage/CheckinStorage";
+import ShareOnWhatsApp from "../components/ShareOnWhatsApp";
 
 export default function Checkout({ route, navigation }) {
 
@@ -185,6 +186,8 @@ export default function Checkout({ route, navigation }) {
 
             {/* Bottom Button */}
             <View style={styles.bottomBar}>
+
+                <ShareOnWhatsApp item={item} />
 
                 <TouchableOpacity style={styles.exitBtn} onPress={confirmExit}>
                     <MaterialCommunityIcons name="gate" size={22} color="#fff" />

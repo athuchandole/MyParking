@@ -3,6 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Header from "../components/Header";
+import ShareOnWhatsApp from "../components/ShareOnWhatsApp";
 
 export default function BillScreen({ route, navigation }) {
 
@@ -82,7 +83,9 @@ export default function BillScreen({ route, navigation }) {
                     </View>
 
                 </View>
-
+                <View style={{ padding: 16 }}>
+                    <ShareOnWhatsApp item={item} />
+                </View>
             </ScrollView>
 
         </View>
