@@ -52,6 +52,7 @@ export default function DashboardScreen({ navigation }) {
     let revenue = 0;
 
     list.forEach(v => {
+
         if (v.status === "inactive") {
 
             const entry = new Date(v.createdAt);
@@ -67,11 +68,20 @@ export default function DashboardScreen({ navigation }) {
     });
 
     const openCard = (item) => {
+
         if (item.status === "active") {
             navigation.navigate("Checkout", { item });
         } else {
             navigation.navigate("BillScreen", { item });
         }
+    };
+
+    const openEdit = (item) => {
+
+        navigation.navigate("Checkin", {
+            editMode: true,
+            item
+        });
     };
 
     const highlight = (text = "", query = "") => {
@@ -108,6 +118,7 @@ export default function DashboardScreen({ navigation }) {
 
             <TouchableOpacity
                 onPress={() => openCard(item)}
+                onLongPress={() => openEdit(item)}
                 activeOpacity={0.9}
             >
 
@@ -203,30 +214,18 @@ export default function DashboardScreen({ navigation }) {
             <View style={styles.stats}>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>
-                        {active}
-                    </Text>
-                    <Text style={styles.statLabel}>
-                        Active
-                    </Text>
+                    <Text style={styles.statNumber}>{active}</Text>
+                    <Text style={styles.statLabel}>Active</Text>
                 </View>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>
-                        {inactive}
-                    </Text>
-                    <Text style={styles.statLabel}>
-                        Exited
-                    </Text>
+                    <Text style={styles.statNumber}>{inactive}</Text>
+                    <Text style={styles.statLabel}>Exited</Text>
                 </View>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>
-                        ₹{revenue}
-                    </Text>
-                    <Text style={styles.statLabel}>
-                        Revenue
-                    </Text>
+                    <Text style={styles.statNumber}>₹{revenue}</Text>
+                    <Text style={styles.statLabel}>Revenue</Text>
                 </View>
 
             </View>
@@ -264,96 +263,20 @@ export default function DashboardScreen({ navigation }) {
 
 const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
-        backgroundColor: "#f6f7f8"
-    },
-
-    stats: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        padding: 12
-    },
-
-    statBox: {
-        backgroundColor: "#fff",
-        padding: 12,
-        borderRadius: 10,
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        minWidth: 90
-    },
-
-    statNumber: {
-        fontSize: 18,
-        fontWeight: "800"
-    },
-
-    statLabel: {
-        fontSize: 11,
-        color: "#64748b",
-        marginTop: 3
-    },
-
-    card: {
-        backgroundColor: "#fff",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        padding: 14,
-        marginBottom: 12,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-
-    vehicle: {
-        fontSize: 17,
-        fontWeight: "800"
-    },
-
-    row: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-        marginTop: 6
-    },
-
-    text: {
-        fontSize: 13,
-        color: "#64748b"
-    },
-
-    right: {
-        alignItems: "flex-end",
-        gap: 10
-    },
-
-    badge: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 12
-    },
-
-    badgeText: {
-        fontSize: 11,
-        fontWeight: "700"
-    },
-
-    highlight: {
-        backgroundColor: "#fde68a",
-        fontWeight: "700"
-    },
-
-    empty: {
-        alignItems: "center",
-        marginTop: 80
-    },
-
-    emptyText: {
-        marginTop: 8,
-        color: "#64748b"
-    }
+    container: { flex: 1, backgroundColor: "#f6f7f8" },
+    stats: { flexDirection: "row", justifyContent: "space-around", padding: 12 },
+    statBox: { backgroundColor: "#fff", padding: 12, borderRadius: 10, alignItems: "center", borderWidth: 1, borderColor: "#e2e8f0", minWidth: 90 },
+    statNumber: { fontSize: 18, fontWeight: "800" },
+    statLabel: { fontSize: 11, color: "#64748b", marginTop: 3 },
+    card: { backgroundColor: "#fff", borderRadius: 12, borderWidth: 1, borderColor: "#e2e8f0", padding: 14, marginBottom: 12, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+    vehicle: { fontSize: 17, fontWeight: "800" },
+    row: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 },
+    text: { fontSize: 13, color: "#64748b" },
+    right: { alignItems: "flex-end", gap: 10 },
+    badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+    badgeText: { fontSize: 11, fontWeight: "700" },
+    highlight: { backgroundColor: "#fde68a", fontWeight: "700" },
+    empty: { alignItems: "center", marginTop: 80 },
+    emptyText: { marginTop: 8, color: "#64748b" }
 
 });
