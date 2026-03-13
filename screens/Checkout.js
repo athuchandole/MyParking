@@ -133,6 +133,8 @@ export default function Checkout({ route, navigation }) {
                     </View>
                 </View>
 
+                <ShareOnWhatsApp item={item} />
+
                 {/* Parking Receipt */}
                 <View style={styles.sectionPadding}>
 
@@ -187,7 +189,6 @@ export default function Checkout({ route, navigation }) {
             {/* Bottom Button */}
             <View style={styles.bottomBar}>
 
-                <ShareOnWhatsApp item={item} />
 
                 <TouchableOpacity style={styles.exitBtn} onPress={confirmExit}>
                     <MaterialCommunityIcons name="gate" size={22} color="#fff" />

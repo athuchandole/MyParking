@@ -48,27 +48,52 @@ Total Amount : ₹${amount}
 
 Thank you for visiting 🙏`;
 
-            const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
+            let phone = item.phoneNumber ? item.phoneNumber.replace(/[^0-9]/g, "") : "";
+
+            let url = "";
+
+            if (phone.length === 10) {
+
+                const fullNumber = `91${phone}`;
+
+                url = `whatsapp://send?phone=${fullNumber}&text=${encodeURIComponent(message)}`;
+
+            } else {
+
+                // fallback if no phone
+                url = `whatsapp://send?text=${encodeURIComponent(message)}`;
+
+            }
 
             const supported = await Linking.canOpenURL(url);
 
             if (supported) {
+
                 await Linking.openURL(url);
+
             } else {
+
                 Alert.alert("WhatsApp not installed");
+
             }
 
         } catch (e) {
+
             Alert.alert("Error", "Unable to share receipt");
+
         }
+
     };
 
     return (
+
         <TouchableOpacity style={styles.btn} onPress={shareBill}>
             <MaterialCommunityIcons name="whatsapp" size={20} color="#fff" />
             <Text style={styles.text}>Share on WhatsApp</Text>
         </TouchableOpacity>
+
     );
+
 }
 
 const styles = StyleSheet.create({
