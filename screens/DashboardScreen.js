@@ -1,6 +1,15 @@
 //Parking/screens/DashboardScreen.js
+
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    Modal,
+    Pressable
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import Header from "../components/Header";
@@ -11,6 +20,9 @@ export default function DashboardScreen({ navigation }) {
 
     const [list, setList] = useState([]);
     const [search, setSearch] = useState("");
+
+    const [optionVisible, setOptionVisible] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const load = async () => {
         const data = await getCheckins();
@@ -23,21 +35,13 @@ export default function DashboardScreen({ navigation }) {
         }, [])
     );
 
-    const remove = (id) => {
-        Alert.alert("Delete Entry", "Are you sure?", [
-            { text: "Cancel" },
-            {
-                text: "Delete",
-                style: "destructive",
-                onPress: async () => {
-                    await deleteCheckin(id);
-                    load();
-                }
-            }
-        ]);
+    const remove = async (id) => {
+        await deleteCheckin(id);
+        load();
     };
 
     const filtered = list.filter(v => {
+
         const q = search.toLowerCase();
 
         return (
@@ -76,12 +80,26 @@ export default function DashboardScreen({ navigation }) {
         }
     };
 
-    const openEdit = (item) => {
+    const openOptions = (item) => {
+        setSelectedItem(item);
+        setOptionVisible(true);
+    };
+
+    const editItem = () => {
+
+        setOptionVisible(false);
 
         navigation.navigate("Checkin", {
             editMode: true,
-            item
+            item: selectedItem
         });
+    };
+
+    const deleteItem = async () => {
+
+        await deleteCheckin(selectedItem.id);
+        setOptionVisible(false);
+        load();
     };
 
     const highlight = (text = "", query = "") => {
@@ -118,7 +136,7 @@ export default function DashboardScreen({ navigation }) {
 
             <TouchableOpacity
                 onPress={() => openCard(item)}
-                onLongPress={() => openEdit(item)}
+                onLongPress={() => openOptions(item)}
                 activeOpacity={0.9}
             >
 
@@ -184,16 +202,6 @@ export default function DashboardScreen({ navigation }) {
                             </Text>
                         </View>
 
-                        <TouchableOpacity
-                            onPress={() => remove(item.id)}
-                        >
-                            <MaterialCommunityIcons
-                                name="delete-outline"
-                                size={22}
-                                color="#dc2626"
-                            />
-                        </TouchableOpacity>
-
                     </View>
 
                 </View>
@@ -257,6 +265,67 @@ export default function DashboardScreen({ navigation }) {
                 }
             />
 
+            {/* Options Popup */}
+            <Modal
+                visible={optionVisible}
+                transparent
+                animationType="fade"
+            >
+
+                <Pressable
+                    style={styles.overlay}
+                    onPress={() => setOptionVisible(false)}
+                >
+
+                    <View style={styles.popup}>
+
+                        <Text style={styles.popupTitle}>
+                            Select Option
+                        </Text>
+
+                        <TouchableOpacity
+                            style={[styles.optionBtn, styles.editBtn]}
+                            onPress={editItem}
+                        >
+                            <MaterialCommunityIcons
+                                name="pencil"
+                                size={20}
+                                color="#fff"
+                            />
+                            <Text style={styles.optionText}>
+                                Edit Entry
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.optionBtn, styles.deleteBtn]}
+                            onPress={deleteItem}
+                        >
+                            <MaterialCommunityIcons
+                                name="delete"
+                                size={20}
+                                color="#fff"
+                            />
+                            <Text style={styles.optionText}>
+                                Delete Entry
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.cancelBtn}
+                            onPress={() => setOptionVisible(false)}
+                        >
+                            <Text style={styles.cancelText}>
+                                Cancel
+                            </Text>
+                        </TouchableOpacity>
+
+                    </View>
+
+                </Pressable>
+
+            </Modal>
+
         </View>
     );
 }
@@ -264,19 +333,120 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
 
     container: { flex: 1, backgroundColor: "#f6f7f8" },
-    stats: { flexDirection: "row", justifyContent: "space-around", padding: 12 },
-    statBox: { backgroundColor: "#fff", padding: 12, borderRadius: 10, alignItems: "center", borderWidth: 1, borderColor: "#e2e8f0", minWidth: 90 },
+
+    stats: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 12
+    },
+
+    statBox: {
+        backgroundColor: "#fff",
+        padding: 12,
+        borderRadius: 10,
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#e2e8f0",
+        minWidth: 90
+    },
+
     statNumber: { fontSize: 18, fontWeight: "800" },
     statLabel: { fontSize: 11, color: "#64748b", marginTop: 3 },
-    card: { backgroundColor: "#fff", borderRadius: 12, borderWidth: 1, borderColor: "#e2e8f0", padding: 14, marginBottom: 12, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+
+    card: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#e2e8f0",
+        padding: 14,
+        marginBottom: 12,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+    },
+
     vehicle: { fontSize: 17, fontWeight: "800" },
-    row: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 },
+
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        marginTop: 6
+    },
+
     text: { fontSize: 13, color: "#64748b" },
-    right: { alignItems: "flex-end", gap: 10 },
-    badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+
+    right: { alignItems: "flex-end" },
+
+    badge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12
+    },
+
     badgeText: { fontSize: 11, fontWeight: "700" },
-    highlight: { backgroundColor: "#fde68a", fontWeight: "700" },
+
+    highlight: {
+        backgroundColor: "#fde68a",
+        fontWeight: "700"
+    },
+
     empty: { alignItems: "center", marginTop: 80 },
-    emptyText: { marginTop: 8, color: "#64748b" }
+    emptyText: { marginTop: 8, color: "#64748b" },
+
+    overlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+
+    popup: {
+        width: 260,
+        backgroundColor: "#fff",
+        borderRadius: 16,
+        padding: 20,
+        alignItems: "center"
+    },
+
+    popupTitle: {
+        fontSize: 16,
+        fontWeight: "700",
+        marginBottom: 16
+    },
+
+    optionBtn: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        width: "100%",
+        padding: 12,
+        borderRadius: 10,
+        marginBottom: 10,
+        justifyContent: "center"
+    },
+
+    editBtn: {
+        backgroundColor: "#3b82f6"
+    },
+
+    deleteBtn: {
+        backgroundColor: "#ef4444"
+    },
+
+    optionText: {
+        color: "#fff",
+        fontWeight: "700"
+    },
+
+    cancelBtn: {
+        marginTop: 4,
+        padding: 10
+    },
+
+    cancelText: {
+        color: "#64748b",
+        fontWeight: "600"
+    }
 
 });
