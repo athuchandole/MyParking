@@ -17,8 +17,14 @@ import { saveDefaultPlate, getDefaultPlate } from '../storage/DefaultPlateStorag
 export default function SettingsScreen({ navigation }) {
     const [darkMode, setDarkMode] = useState(false);
     const [language, setLanguage] = useState('English');
+
     const [defaultPart1, setDefaultPart1] = useState('');
     const [defaultPart2, setDefaultPart2] = useState('');
+
+    const [originalPart1, setOriginalPart1] = useState('');
+    const [originalPart2, setOriginalPart2] = useState('');
+
+    const [showSaveButton, setShowSaveButton] = useState(false);
 
     useEffect(() => {
         const loadDefaultPlate = async () => {
@@ -26,13 +32,36 @@ export default function SettingsScreen({ navigation }) {
             if (plate) {
                 setDefaultPart1(plate.part1);
                 setDefaultPart2(plate.part2);
+
+                setOriginalPart1(plate.part1);
+                setOriginalPart2(plate.part2);
             }
         };
         loadDefaultPlate();
     }, []);
 
+    useEffect(() => {
+        if (
+            defaultPart1 !== originalPart1 ||
+            defaultPart2 !== originalPart2
+        ) {
+            setShowSaveButton(true);
+        } else {
+            setShowSaveButton(false);
+        }
+    }, [defaultPart1, defaultPart2, originalPart1, originalPart2]);
+
     const handleSaveDefaultPlate = async () => {
-        await saveDefaultPlate({ part1: defaultPart1.toUpperCase(), part2: defaultPart2 });
+        const part1 = defaultPart1.toUpperCase();
+        const part2 = defaultPart2;
+
+        await saveDefaultPlate({ part1, part2 });
+
+        setOriginalPart1(part1);
+        setOriginalPart2(part2);
+
+        setShowSaveButton(false);
+
         alert('Default Plate saved!');
     };
 
@@ -121,6 +150,7 @@ export default function SettingsScreen({ navigation }) {
                                     placeholder="AA"
                                 />
                             </View>
+
                             <View style={{ flex: 1, marginLeft: 12 }}>
                                 <Text style={styles.label}>Part 2 (Numbers)</Text>
                                 <TextInput
@@ -134,12 +164,14 @@ export default function SettingsScreen({ navigation }) {
                             </View>
                         </View>
 
-                        <TouchableOpacity
-                            style={[styles.submitButton, { marginTop: 16 }]}
-                            onPress={handleSaveDefaultPlate}
-                        >
-                            <Text style={styles.submitText}>Save Default Plate</Text>
-                        </TouchableOpacity>
+                        {showSaveButton && (
+                            <TouchableOpacity
+                                style={[styles.submitButton, { marginTop: 16 }]}
+                                onPress={handleSaveDefaultPlate}
+                            >
+                                <Text style={styles.submitText}>Save Default Plate</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
 
