@@ -4,47 +4,37 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "PARKING_WHATSAPP_TEMPLATE";
 
+// Upgraded Active Template - Simple English, more info, using @vehicleType
 export const DEFAULT_ACTIVE_TEMPLATE =
-    `🚗 PARKING RECEIPT
+    `Dear @driverName,
 
-Vehicle : @vehicleNumber
-Driver : @driverName
-Phone : @phoneNumber
-Type : @vehicleType
-Rate : ₹@rate / @perHours hr
+Your @vehicleType is safely parked at our facility. We have received your vehicle at @entryTime, and it is currently under our care. Here are some important details for your reference:
 
-Entry Time : @entryTime
-Current Time : @exitTime
+• Vehicle Owner: @driverName
+• Contact Number: @phoneNumber
+• Vehicle Number: @vehicleNumber
+• Parking Rate: ₹@rate
+• Current Status: ACTIVE PARKING
 
-Status : ACTIVE PARKING
+You can relax knowing your @vehicleType is in safe hands. We are always here to assist you if needed. Thank you for choosing our parking service. 🚗`;
 
-Duration : @duration
-Billable Blocks : @billableBlocks
-
-Total Amount : ₹@amount
-
-Thank you for visiting 🙏`;
-
+// Upgraded Inactive Template - Simple English, more info, using @vehicleType
 export const DEFAULT_EXIT_TEMPLATE =
-    `🚗 PARKING RECEIPT
+    `Dear @driverName,
 
-Vehicle : @vehicleNumber
-Driver : @driverName
-Phone : @phoneNumber
-Type : @vehicleType
-Rate : ₹@rate / @perHours hr
+Thank you for parking with us. Your @vehicleType, number @vehicleNumber, has been safely returned. Here are the details of your parking session:
 
-Entry Time : @entryTime
-Exit Time : @exitTime
+• Vehicle Owner: @driverName
+• Contact Number: @phoneNumber
+• Vehicle Type: @vehicleType
+• Vehicle Number: @vehicleNumber
+• Entry Time: @entryTime
+• Exit Time: @exitTime
+• Duration Parked: @duration
+• Total Amount: ₹@amount
+• Status: VEHICLE EXITED
 
-Status : VEHICLE EXITED
-
-Duration : @duration
-Billable Blocks : @billableBlocks
-
-Total Amount : ₹@amount
-
-Thank you for visiting 🙏`;
+We hope you had a smooth experience and look forward to welcoming you again. Drive safely! 🙏`;
 
 export async function saveMessageTemplates(data) {
     try {

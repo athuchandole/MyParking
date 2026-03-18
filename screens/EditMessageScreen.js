@@ -11,7 +11,12 @@ import {
     Alert
 } from "react-native";
 import Header from "../components/Header";
-import { getMessageTemplates, saveMessageTemplates } from "../storage/MessageTemplateStorage";
+import {
+    getMessageTemplates,
+    saveMessageTemplates,
+    DEFAULT_ACTIVE_TEMPLATE,
+    DEFAULT_EXIT_TEMPLATE
+} from "../storage/MessageTemplateStorage";
 
 const AVAILABLE_VARS = [
     "@vehicleNumber",
@@ -85,6 +90,38 @@ export default function EditMessageScreen({ navigation }) {
     const getCurrentTemplate = () => (selectedType === "active" ? activeTemplate : inactiveTemplate);
     const setCurrentTemplate = (text) => {
         selectedType === "active" ? setActiveTemplate(text) : setInactiveTemplate(text);
+    };
+
+    const resetTemplate = () => {
+        Alert.alert(
+            "Reset Template",
+            "Are you sure you want to reset to default?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: async () => {
+                        if (selectedType === "active") {
+                            setActiveTemplate(DEFAULT_ACTIVE_TEMPLATE);
+                        } else {
+                            setInactiveTemplate(DEFAULT_EXIT_TEMPLATE);
+                        }
+                        // Remove saved template from storage
+                        const updated = {
+                            active: selectedType === "active" ? DEFAULT_ACTIVE_TEMPLATE : activeTemplate,
+                            inactive: selectedType === "inactive" ? DEFAULT_EXIT_TEMPLATE : inactiveTemplate
+                        };
+                        await saveMessageTemplates(updated);
+                        setOriginalTemplates(updated);
+                        setEditing(false);
+                        Alert.alert("Success", "Template reset to default");
+                    }
+                }
+            ]
+        );
     };
 
     // Render preview with variables + bold/italic formatting
@@ -165,6 +202,13 @@ export default function EditMessageScreen({ navigation }) {
                 {!editing && (
                     <TouchableOpacity style={styles.editPencil} onPress={() => setEditing(true)}>
                         <Text style={styles.editPencilText}>✏️ Edit Message</Text>
+                    </TouchableOpacity>
+                )}
+
+                {/* Reset button */}
+                {!editing && (
+                    <TouchableOpacity style={styles.resetBtn} onPress={resetTemplate}>
+                        <Text style={styles.resetBtnText}>♻️ Reset to Default</Text>
                     </TouchableOpacity>
                 )}
 
@@ -285,6 +329,15 @@ const styles = StyleSheet.create({
     },
     editPencilText: {
         color: "#2563eb",
+        fontWeight: "700",
+        fontSize: 16
+    },
+    resetBtn: {
+        alignSelf: "flex-end",
+        marginBottom: 16
+    },
+    resetBtnText: {
+        color: "#ef4444",
         fontWeight: "700",
         fontSize: 16
     },
