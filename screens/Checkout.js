@@ -29,6 +29,13 @@ export default function Checkout({ route, navigation }) {
     const billableBlocks = Math.ceil(totalHours / perHours);
     const amount = billableBlocks * rate;
 
+    // ✅ vehicle icon helper
+    const getVehicleIcon = () => {
+        if (item.vehicleType === 'bike') return 'bike';
+        if (item.vehicleType === 'auto') return 'rickshaw';
+        return 'car';
+    };
+
     // ✅ WhatsApp helpers
     const replaceVars = (template, data) => {
         let msg = template;
@@ -98,7 +105,6 @@ export default function Checkout({ route, navigation }) {
         }
     };
 
-    // ✅ FINAL FIXED FLOW
     const confirmExit = async () => {
 
         setShowModal(false);
@@ -113,10 +119,8 @@ export default function Checkout({ route, navigation }) {
 
         if (success) {
 
-            // ✅ Step 1: Go back FIRST (remove this screen)
             navigation.goBack();
 
-            // ✅ Step 2: Delay to ensure screen is unmounted
             setTimeout(() => {
                 shareOnWhatsApp();
             }, 500);
@@ -149,18 +153,35 @@ export default function Checkout({ route, navigation }) {
 
                 <View style={styles.sectionPadding}>
                     <View style={styles.imageRow}>
+
+                        {/* DRIVER IMAGE */}
                         <View style={styles.imageBox}>
-                            <Image source={{ uri: item.driverImage }} style={styles.fullImage} />
+                            {item.driverImage ? (
+                                <Image source={{ uri: item.driverImage }} style={styles.fullImage} />
+                            ) : (
+                                <View style={styles.placeholder}>
+                                    <MaterialCommunityIcons name="account-circle" size={60} color="#94a3b8" />
+                                </View>
+                            )}
                             <View style={styles.imageLabel}>
                                 <Text style={styles.imageLabelText}>DRIVER</Text>
                             </View>
                         </View>
+
+                        {/* VEHICLE IMAGE */}
                         <View style={styles.imageBox}>
-                            <Image source={{ uri: item.vehicleImage }} style={styles.fullImage} />
+                            {item.vehicleImage ? (
+                                <Image source={{ uri: item.vehicleImage }} style={styles.fullImage} />
+                            ) : (
+                                <View style={styles.placeholder}>
+                                    <MaterialCommunityIcons name={getVehicleIcon()} size={60} color="#94a3b8" />
+                                </View>
+                            )}
                             <View style={styles.imageLabel}>
                                 <Text style={styles.imageLabelText}>{item.vehicleType}</Text>
                             </View>
                         </View>
+
                     </View>
                 </View>
 
@@ -261,8 +282,16 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f6f7f8' },
     sectionPadding: { padding: 16 },
     imageRow: { flexDirection: 'row', gap: 12 },
-    imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden' },
+    imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden', backgroundColor: '#f1f5f9' },
     fullImage: { width: '100%', height: '100%' },
+
+    // ✅ NEW placeholder style
+    placeholder: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
     imageLabel: { position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
     imageLabelText: { fontSize: 11, fontWeight: '700', color: '#137fec' },
 
