@@ -8,7 +8,6 @@ import {
     TouchableOpacity,
     Dimensions,
     Animated,
-    Easing,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
@@ -49,7 +48,6 @@ export default function Onboarding() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const navigation = useNavigation();
 
-    // Animation refs
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(width)).current;
     const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -157,8 +155,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "space-between",
-        paddingVertical: 40,
-        paddingHorizontal: 20,
+        paddingVertical: 50,
+        paddingHorizontal: 25,
     },
     topRight: {
         alignItems: "flex-end",
@@ -175,47 +173,47 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     image: {
-        width: width * 0.7,
-        height: width * 0.7,
-        marginBottom: 30,
-        borderRadius: 30,
+        width: width * 0.65,
+        height: width * 0.65,
+        marginBottom: 25,
+        borderRadius: 25,
     },
     title: {
-        fontSize: 30,
+        fontSize: 28,
         fontWeight: "900",
         textAlign: "center",
-        marginBottom: 14,
+        marginBottom: 12,
         color: "#101922",
     },
     description: {
-        fontSize: 18,
+        fontSize: 17,
         textAlign: "center",
         color: "#606770",
-        lineHeight: 28,
+        lineHeight: 26,
         maxWidth: width * 0.8,
     },
     dotsContainer: {
         flexDirection: "row",
         justifyContent: "center",
-        marginBottom: 30,
-        gap: 12,
+        marginBottom: 25,
+        gap: 10,
     },
     dot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
     },
     button: {
         backgroundColor: "#137fec",
-        paddingVertical: 18,
-        borderRadius: 40,
+        paddingVertical: 14,
+        borderRadius: 35,
         alignItems: "center",
         alignSelf: "center",
-        width: width * 0.7,
+        width: width * 0.6,
     },
     buttonText: {
         color: "#fff",
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "bold",
     },
 });
