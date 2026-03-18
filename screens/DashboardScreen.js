@@ -217,6 +217,7 @@ export default function DashboardScreen({ navigation }) {
             <Header
                 title="Parking Dashboard"
                 navigation={navigation}
+                showBack={false}
             />
 
             <View style={styles.stats}>
