@@ -39,7 +39,6 @@ export default function VehicleCard({ item, search }) {
     useEffect(() => {
 
         const updateTimer = () => {
-
             const now = new Date();
             const diff = now - created;
 
@@ -77,9 +76,7 @@ export default function VehicleCard({ item, search }) {
     }, []);
 
     const highlight = (text) => {
-
         if (!search) return <Text>{text}</Text>;
-
         const q = search.toLowerCase();
         const parts = text.toString().split(new RegExp(`(${q})`, 'gi'));
 
@@ -97,76 +94,47 @@ export default function VehicleCard({ item, search }) {
     };
 
     return (
-
         <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => navigation.navigate('Checkout', { item })}
         >
-
             <View style={styles.card}>
 
                 <View style={styles.row}>
 
                     {/* Driver Image */}
                     <View style={styles.imageBox}>
-
-                        {item.driverImage ? (
-                            <Image
-                                source={{ uri: item.driverImage }}
-                                style={styles.image}
-                            />
-                        ) : (
-                            <MaterialCommunityIcons
-                                name="account-circle"
-                                size={44}
-                                color="#94a3b8"
-                            />
-                        )}
-
-                        {/* Vehicle badge */}
+                        <Image
+                            source={item.driverImage ? { uri: item.driverImage } : require('../assets/app-icon.png')}
+                            style={styles.image}
+                        />
+                        {/* Vehicle Icon Badge */}
                         <View style={[styles.vehicleBadge, { backgroundColor: vehicleColor }]}>
                             <MaterialCommunityIcons
                                 name={vehicleIcon}
-                                size={16}
+                                size={20}
                                 color="#fff"
                             />
                         </View>
-
                     </View>
 
                     <View style={styles.content}>
 
                         <View style={styles.header}>
-
-                            <View>
-
-                                <Text style={styles.vehicleNumber}>
-                                    {highlight(item.vehicleNumber)}
-                                </Text>
-
-                                <Text style={styles.vehicleType}>
-                                    {highlight(item.vehicleType)}
-                                </Text>
-
-                            </View>
+                            <Text style={styles.vehicleNumber}>
+                                {highlight(item.vehicleNumber)}
+                            </Text>
 
                             {/* Active Indicator */}
                             <View style={styles.statusBox}>
-
                                 <Animated.View
                                     style={[
                                         styles.activeDot,
                                         { transform: [{ scale: pulse }] }
                                     ]}
                                 />
-
-
-                                <Text style={styles.activeText}>
-                                    Active
-                                </Text>
-
+                                <Text style={styles.activeText}>Active</Text>
                             </View>
-
                         </View>
 
                         <View style={styles.infoRow}>
@@ -224,7 +192,6 @@ export default function VehicleCard({ item, search }) {
                 </View>
 
             </View>
-
         </TouchableOpacity>
     );
 }
@@ -232,43 +199,48 @@ export default function VehicleCard({ item, search }) {
 const styles = StyleSheet.create({
 
     card: {
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-        overflow: 'hidden',
-        marginBottom: 12
+        backgroundColor: '#ecf5fd',
+        borderRadius: 16,
+        marginBottom: 14,
+        overflow: 'hidden'
     },
 
     row: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        padding: 12
     },
 
     imageBox: {
-        width: 90,
-        height: 100,
-        backgroundColor: '#f1f5f9',
+        width: 100,
+        height: 110,
+        borderRadius: 16,
+        overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: '#e2e8f0'
     },
 
     image: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        resizeMode: 'cover'
     },
 
     vehicleBadge: {
         position: 'absolute',
         bottom: 6,
         right: 6,
-        padding: 5,
-        borderRadius: 14
+        padding: 6,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#fff'
     },
 
     content: {
         flex: 1,
-        padding: 12
+        paddingLeft: 14,
+        justifyContent: 'center'
     },
 
     header: {
@@ -278,16 +250,9 @@ const styles = StyleSheet.create({
     },
 
     vehicleNumber: {
-        fontSize: 19,
+        fontSize: 20,
         fontWeight: '800',
         color: '#0f172a'
-    },
-
-    vehicleType: {
-        fontSize: 12,
-        color: '#64748b',
-        marginTop: 2,
-        textTransform: 'capitalize'
     },
 
     statusBox: {
@@ -297,9 +262,9 @@ const styles = StyleSheet.create({
     },
 
     activeDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
         backgroundColor: '#22c55e'
     },
 
@@ -328,21 +293,21 @@ const styles = StyleSheet.create({
     },
 
     bottomRow: {
-        marginTop: 10,
+        marginTop: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
 
     rate: {
-        backgroundColor: '#eff6ff',
+        backgroundColor: '#e0f2fe',
         paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 6
+        paddingVertical: 6,
+        borderRadius: 8
     },
 
     rateText: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '700',
         color: '#2563eb'
     },
@@ -354,7 +319,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff7ed',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 6
+        borderRadius: 8
     },
 
     durationText: {
