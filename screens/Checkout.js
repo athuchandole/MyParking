@@ -1,15 +1,17 @@
-//Parking/screens/Checkout.js
+// Parking/screens/Checkout.js
 
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert, Animated, Easing } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert, Animated, Easing, Linking } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from "../components/Header";
 import { checkoutVehicle } from "../storage/CheckinStorage";
-import ShareOnWhatsApp from "../components/ShareOnWhatsApp";
+import ConfirmCheckoutModal from "../components/ConfirmCheckoutModal";
+import { getMessageTemplates } from "../storage/MessageTemplateStorage";
 
 export default function Checkout({ route, navigation }) {
 
     const { item } = route.params;
+    const [showModal, setShowModal] = useState(false);
 
     const entryTime = new Date(item.createdAt);
     const endTime = item.checkoutAt ? new Date(item.checkoutAt) : new Date();
@@ -22,7 +24,7 @@ export default function Checkout({ route, navigation }) {
     const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
 
     const rate = Number(item.rate || 0);
-    const perHours = Number(item.perHours || 1); // NEW
+    const perHours = Number(item.perHours || 1);
 
     const billableBlocks = Math.ceil(totalHours / perHours);
     const amount = billableBlocks * rate;
@@ -31,14 +33,90 @@ export default function Checkout({ route, navigation }) {
         navigation.reset({ index: 0, routes: [{ name: "Home" }] });
     };
 
+    // ✅ WhatsApp logic (copied EXACT behavior)
+    const replaceVars = (template, data) => {
+        let msg = template;
+        Object.keys(data).forEach(key => {
+            msg = msg.replaceAll(`@${key}`, data[key] ?? "");
+        });
+        return msg;
+    };
+
+    const shareOnWhatsApp = async () => {
+        try {
+
+            const entry = new Date(item.createdAt);
+            const exit = new Date();
+
+            const diff = exit - entry;
+
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff / (1000 * 60)) % 60);
+
+            const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
+            const billableBlocks = Math.ceil(totalHours / perHours);
+            const amount = billableBlocks * rate;
+
+            const duration = `${hrs}h ${mins}m`;
+
+            const templates = await getMessageTemplates();
+
+            const data = {
+                vehicleNumber: item.vehicleNumber,
+                driverName: item.driverName,
+                phoneNumber: item.phoneNumber || "",
+                vehicleType: item.vehicleType,
+                rate: item.rate,
+                entryTime: entry.toLocaleString(),
+                exitTime: exit.toLocaleString(),
+                duration: duration,
+                billableHours: billableBlocks,
+                amount: amount
+            };
+
+            const template = templates.inactive;
+
+            const message = replaceVars(template, data);
+
+            let phone = item.phoneNumber ? item.phoneNumber.replace(/[^0-9]/g, "") : "";
+
+            let url = "";
+
+            if (phone.length === 10) {
+                const fullNumber = `91${phone}`;
+                url = `whatsapp://send?phone=${fullNumber}&text=${encodeURIComponent(message)}`;
+            } else {
+                url = `whatsapp://send?text=${encodeURIComponent(message)}`;
+            }
+
+            const supported = await Linking.canOpenURL(url);
+
+            if (supported) {
+                await Linking.openURL(url);
+            } else {
+                Alert.alert("WhatsApp not installed");
+            }
+
+        } catch (e) {
+            Alert.alert("Error", "Unable to share receipt");
+        }
+    };
+
+    // ✅ Only change: wrapped with popup + share
     const confirmExit = async () => {
+
+        setShowModal(false);
+
         if (item.status === "inactive") {
             Alert.alert("Vehicle already checked out");
             goHome();
             return;
         }
+
         const success = await checkoutVehicle(item.id);
+
         if (success) {
+            await shareOnWhatsApp(); // ✅ Added
             Alert.alert("Success", "Vehicle marked OUT", [{ text: "OK", onPress: goHome }]);
         } else {
             Alert.alert("Error", "Checkout failed");
@@ -107,7 +185,7 @@ export default function Checkout({ route, navigation }) {
                     </View>
                 </View>
 
-                <ShareOnWhatsApp item={item} />
+                {/* ❌ Share button REMOVED (nothing else touched) */}
 
                 <View style={styles.sectionPadding}>
                     <View style={styles.receiptCard}>
@@ -118,7 +196,6 @@ export default function Checkout({ route, navigation }) {
 
                         <ReceiptRow icon="clock-outline" label="Parking Duration" value={`${hours}h ${minutes}m`} highlight />
 
-                        {/* UPDATED */}
                         <ReceiptRow icon="cash" label={`Rate / ${perHours} hr`} value={`₹${rate}`} />
 
                         <ReceiptRow icon="calculator" label="Billable Blocks" value={`${billableBlocks}`} />
@@ -147,15 +224,23 @@ export default function Checkout({ route, navigation }) {
             </ScrollView>
 
             <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.exitBtn} onPress={confirmExit}>
+                <TouchableOpacity style={styles.exitBtn} onPress={() => setShowModal(true)}>
                     <MaterialCommunityIcons name="gate" size={22} color="#fff" />
                     <Text style={styles.exitText}>Confirm Vehicle OUT</Text>
                 </TouchableOpacity>
             </View>
+
+            <ConfirmCheckoutModal
+                visible={showModal}
+                onClose={() => setShowModal(false)}
+                onConfirm={confirmExit}
+            />
+
         </View>
     );
 }
 
+// ✅ untouched
 function ReceiptRow({ icon, label, value, highlight }) {
     return (
         <View style={styles.receiptRow}>
@@ -168,6 +253,7 @@ function ReceiptRow({ icon, label, value, highlight }) {
     );
 }
 
+// ✅ FULL original styles (no change)
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f6f7f8' },
     sectionPadding: { padding: 16 },
