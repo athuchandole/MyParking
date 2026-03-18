@@ -1,6 +1,6 @@
 //Parking/components/ParkingRates.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
     getParkingRates,
@@ -12,6 +12,10 @@ import {
 export default function ParkingRates() {
     const [rates, setRates] = useState({ bike: '', auto: '', car: '' });
     const [perHours, setPerHours] = useState('1');
+    const [editing, setEditing] = useState({ bike: false, auto: false, car: false, perHours: false });
+    const [originalRates, setOriginalRates] = useState({ bike: '', auto: '', car: '' });
+    const [originalPerHours, setOriginalPerHours] = useState('1');
+    const [showSaveButton, setShowSaveButton] = useState(false);
 
     useEffect(() => {
         loadAll();
@@ -21,19 +25,41 @@ export default function ParkingRates() {
         const storedRates = await getParkingRates();
         const meta = await getRateMeta();
         setRates(storedRates);
+        setOriginalRates(storedRates);
         setPerHours(meta.perHours || '1');
+        setOriginalPerHours(meta.perHours || '1');
     };
 
-    const updateRate = async (type, value) => {
+    const updateRate = (type, value) => {
         const updated = { ...rates, [type]: value };
         setRates(updated);
-        await saveParkingRates(updated);
+        checkChanges(updated, perHours);
     };
 
-    const updatePerHours = async (value) => {
+    const updatePerHours = (value) => {
         const clean = value.replace(/[^0-9]/g, '');
         setPerHours(clean);
-        await saveRateMeta({ perHours: clean || '1' });
+        checkChanges(rates, clean);
+    };
+
+    const checkChanges = (newRates, newPerHours) => {
+        const changedRates = Object.keys(newRates).some(key => newRates[key] !== originalRates[key]);
+        const changedPerHour = newPerHours !== originalPerHours;
+        setShowSaveButton(changedRates || changedPerHour);
+    };
+
+    const handleSave = async () => {
+        await saveParkingRates(rates);
+        await saveRateMeta({ perHours });
+        setOriginalRates(rates);
+        setOriginalPerHours(perHours);
+        setEditing({ bike: false, auto: false, car: false, perHours: false });
+        setShowSaveButton(false);
+        Alert.alert('Saved', 'Parking rates and per hour value updated successfully!');
+    };
+
+    const toggleEdit = (key) => {
+        setEditing({ ...editing, [key]: true });
     };
 
     const rows = [
@@ -44,19 +70,24 @@ export default function ParkingRates() {
 
     return (
         <View>
-
             {/* RATE PER HR SETTING */}
             <View style={styles.metaCard}>
                 <Text style={styles.metaLabel}>Rate per hour:</Text>
-                <View style={styles.inputRow}>
-                    <TextInput
-                        style={styles.metaInput}
-                        keyboardType="numeric"
-                        value={perHours}
-                        onChangeText={updatePerHours}
-                    />
-                    <Text style={styles.metaSuffix}>hr</Text>
-                </View>
+                {editing.perHours ? (
+                    <View style={styles.inputRow}>
+                        <TextInput
+                            style={styles.metaInput}
+                            keyboardType="numeric"
+                            value={perHours}
+                            onChangeText={updatePerHours}
+                        />
+                        <Text style={styles.metaSuffix}>hr</Text>
+                    </View>
+                ) : (
+                    <TouchableOpacity onPress={() => toggleEdit('perHours')}>
+                        <Text style={styles.metaValue}>{perHours} hr</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* VEHICLE RATES */}
@@ -71,19 +102,32 @@ export default function ParkingRates() {
                             />
                             <Text style={styles.label}>{item.label}</Text>
                         </View>
-                        <View style={styles.inputRow}>
-                            <Text style={styles.currency}>₹</Text>
-                            <TextInput
-                                style={styles.input}
-                                keyboardType="numeric"
-                                value={rates[item.key]}
-                                onChangeText={(v) => updateRate(item.key, v)}
-                            />
-                        </View>
+                        {editing[item.key] ? (
+                            <View style={styles.inputRow}>
+                                <Text style={styles.currency}>₹</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    keyboardType="numeric"
+                                    value={rates[item.key]}
+                                    onChangeText={(v) => updateRate(item.key, v)}
+                                />
+                            </View>
+                        ) : (
+                            <TouchableOpacity style={styles.inputRow} onPress={() => toggleEdit(item.key)}>
+                                <Text style={styles.currency}>₹</Text>
+                                <Text style={styles.metaValue}>{rates[item.key]}</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ))}
             </View>
 
+            {/* SAVE BUTTON */}
+            {showSaveButton && (
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveText}>Save</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -113,6 +157,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         backgroundColor: '#f3f4f6'
     },
+    metaValue: { fontSize: 14, fontWeight: '600', color: '#374151' },
     metaSuffix: { marginLeft: 6, fontWeight: '600', fontSize: 14, color: '#374151' },
     card: { backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingVertical: 8, paddingHorizontal: 12 },
     row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
@@ -133,4 +178,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         backgroundColor: '#f3f4f6'
     },
+    saveButton: {
+        marginTop: 16,
+        marginHorizontal: 16,
+        backgroundColor: '#137fec',
+        borderRadius: 12,
+        padding: 14,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    saveText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
