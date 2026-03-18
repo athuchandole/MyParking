@@ -1,5 +1,4 @@
 //Parking/components/ParkingRates.js
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,14 +10,8 @@ import {
 } from '../storage/ParkingRate';
 
 export default function ParkingRates() {
-
-    const [rates, setRates] = useState({
-        bike: '',
-        auto: '',
-        car: '',
-    });
-
-    const [perHours, setPerHours] = useState('1'); // NEW
+    const [rates, setRates] = useState({ bike: '', auto: '', car: '' });
+    const [perHours, setPerHours] = useState('1');
 
     useEffect(() => {
         loadAll();
@@ -27,7 +20,6 @@ export default function ParkingRates() {
     const loadAll = async () => {
         const storedRates = await getParkingRates();
         const meta = await getRateMeta();
-
         setRates(storedRates);
         setPerHours(meta.perHours || '1');
     };
@@ -41,10 +33,7 @@ export default function ParkingRates() {
     const updatePerHours = async (value) => {
         const clean = value.replace(/[^0-9]/g, '');
         setPerHours(clean);
-
-        await saveRateMeta({
-            perHours: clean || '1'
-        });
+        await saveRateMeta({ perHours: clean || '1' });
     };
 
     const rows = [
@@ -58,8 +47,7 @@ export default function ParkingRates() {
 
             {/* RATE PER HR SETTING */}
             <View style={styles.metaCard}>
-                <Text style={styles.metaLabel}>Rate as per hr:</Text>
-
+                <Text style={styles.metaLabel}>Rate per hour:</Text>
                 <View style={styles.inputRow}>
                     <TextInput
                         style={styles.metaInput}
@@ -73,8 +61,8 @@ export default function ParkingRates() {
 
             {/* VEHICLE RATES */}
             <View style={styles.card}>
-                {rows.map((item) => (
-                    <View key={item.key} style={styles.row}>
+                {rows.map((item, index) => (
+                    <View key={item.key} style={[styles.row, index !== rows.length - 1 && styles.rowDivider]}>
                         <View style={styles.left}>
                             <MaterialCommunityIcons
                                 name={item.icon}
@@ -83,7 +71,6 @@ export default function ParkingRates() {
                             />
                             <Text style={styles.label}>{item.label}</Text>
                         </View>
-
                         <View style={styles.inputRow}>
                             <Text style={styles.currency}>₹</Text>
                             <TextInput
@@ -102,87 +89,48 @@ export default function ParkingRates() {
 }
 
 const styles = StyleSheet.create({
-
     metaCard: {
         backgroundColor: '#fff',
         borderRadius: 16,
         borderWidth: 1,
         borderColor: '#e5e7eb',
-        padding: 12,
-        marginBottom: 10,
+        padding: 14,
+        marginBottom: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-
-    metaLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#374151'
-    },
-
+    metaLabel: { fontSize: 14, fontWeight: '600', color: '#374151' },
     metaInput: {
-        width: 50,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-        borderRadius: 6,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        textAlign: 'center',
-        fontWeight: '700',
-    },
-
-    metaSuffix: {
-        marginLeft: 4,
-        fontWeight: '600'
-    },
-
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-    },
-
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 12,
-    },
-
-    left: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-
-    label: {
-        fontSize: 15,
-        fontWeight: '500',
-    },
-
-    inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-
-    currency: {
-        fontSize: 14,
-        color: '#6b7280',
-    },
-
-    input: {
         width: 60,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
-        borderRadius: 6,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 6,
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: 14,
+        backgroundColor: '#f3f4f6'
+    },
+    metaSuffix: { marginLeft: 6, fontWeight: '600', fontSize: 14, color: '#374151' },
+    card: { backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingVertical: 8, paddingHorizontal: 12 },
+    row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
+    rowDivider: { borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
+    left: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    label: { fontSize: 15, fontWeight: '500', color: '#374151' },
+    inputRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    currency: { fontSize: 14, color: '#6b7280' },
+    input: {
+        width: 70,
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 6,
         textAlign: 'right',
-        fontWeight: '700',
+        fontWeight: '600',
+        fontSize: 14,
+        backgroundColor: '#f3f4f6'
     },
 });
