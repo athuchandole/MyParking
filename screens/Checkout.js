@@ -234,6 +234,9 @@ export default function Checkout({ route, navigation }) {
                 visible={showModal}
                 onClose={() => setShowModal(false)}
                 onConfirm={confirmExit}
+                name={item.driverName}
+                vehicleNumber={item.vehicleNumber}
+                amount={amount}
             />
 
         </View>
