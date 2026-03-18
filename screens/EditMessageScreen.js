@@ -19,10 +19,11 @@ const AVAILABLE_VARS = [
     "@phoneNumber",
     "@vehicleType",
     "@rate",
+    "@perHours",
     "@entryTime",
     "@exitTime",
     "@duration",
-    "@billableHours",
+    "@billableBlocks",
     "@amount"
 ];
 

@@ -15,11 +15,17 @@ export default function Checkout({ route, navigation }) {
     const endTime = item.checkoutAt ? new Date(item.checkoutAt) : new Date();
 
     const diff = endTime - entryTime;
+
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
     const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
-    const ratePerHour = item.rate || 0;
-    const amount = totalHours * ratePerHour;
+
+    const rate = Number(item.rate || 0);
+    const perHours = Number(item.perHours || 1); // NEW
+
+    const billableBlocks = Math.ceil(totalHours / perHours);
+    const amount = billableBlocks * rate;
 
     const goHome = () => {
         navigation.reset({ index: 0, routes: [{ name: "Home" }] });
@@ -40,6 +46,7 @@ export default function Checkout({ route, navigation }) {
     };
 
     const pulseAnim = useRef(new Animated.Value(0)).current;
+
     useEffect(() => {
         Animated.loop(
             Animated.sequence([
@@ -59,7 +66,6 @@ export default function Checkout({ route, navigation }) {
             <ScrollView>
                 <Header title="Exit Summary" navigation={navigation} />
 
-                {/* Images Row */}
                 <View style={styles.sectionPadding}>
                     <View style={styles.imageRow}>
                         <View style={styles.imageBox}>
@@ -77,18 +83,21 @@ export default function Checkout({ route, navigation }) {
                     </View>
                 </View>
 
-                {/* Vehicle Info Card */}
                 <View style={styles.sectionPadding}>
                     <View style={styles.infoCard}>
                         <Text style={styles.driverName}>{item.driverName}</Text>
+
                         <View style={styles.numberPlate}>
                             <Text style={styles.vehicleNumber}>{item.vehicleNumber}</Text>
                         </View>
+
                         <View style={styles.vehicleTypeRow}>
                             <MaterialCommunityIcons name="car" size={20} color="#137fec" />
                             <Text style={styles.vehicleTypeText}>{item.vehicleType}</Text>
                         </View>
+
                         <Text style={styles.entryTime}>{entryTime.toLocaleString()}</Text>
+
                         <View style={styles.statusRow}>
                             {item.status === "active" && <Animated.View style={[styles.activeDot, pulseStyle]} />}
                             <Text style={[styles.statusText, item.status === "active" ? styles.activeText : styles.inactiveText]}>
@@ -100,16 +109,22 @@ export default function Checkout({ route, navigation }) {
 
                 <ShareOnWhatsApp item={item} />
 
-                {/* Receipt */}
                 <View style={styles.sectionPadding}>
                     <View style={styles.receiptCard}>
                         <Text style={styles.receiptTitle}>PARKING RECEIPT</Text>
+
                         <ReceiptRow icon="login" label="Entry Time" value={entryTime.toLocaleString()} />
                         <View style={styles.divider} />
+
                         <ReceiptRow icon="clock-outline" label="Parking Duration" value={`${hours}h ${minutes}m`} highlight />
-                        <ReceiptRow icon="cash" label="Rate / Hour" value={`₹${ratePerHour}`} />
-                        <ReceiptRow icon="calculator" label="Billable Hours" value={`${totalHours} hr`} />
+
+                        {/* UPDATED */}
+                        <ReceiptRow icon="cash" label={`Rate / ${perHours} hr`} value={`₹${rate}`} />
+
+                        <ReceiptRow icon="calculator" label="Billable Blocks" value={`${billableBlocks}`} />
+
                         <View style={styles.divider} />
+
                         <View style={styles.amountBox}>
                             <View>
                                 <Text style={styles.amountLabel}>Total Amount</Text>
@@ -120,7 +135,6 @@ export default function Checkout({ route, navigation }) {
                     </View>
                 </View>
 
-                {/* Info Box */}
                 <View style={styles.sectionPadding}>
                     <View style={styles.infoBox}>
                         <MaterialCommunityIcons name="information-outline" size={22} color="#b45309" />
@@ -132,7 +146,6 @@ export default function Checkout({ route, navigation }) {
 
             </ScrollView>
 
-            {/* Bottom Button */}
             <View style={styles.bottomBar}>
                 <TouchableOpacity style={styles.exitBtn} onPress={confirmExit}>
                     <MaterialCommunityIcons name="gate" size={22} color="#fff" />

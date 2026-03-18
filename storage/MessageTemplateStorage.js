@@ -11,7 +11,7 @@ Vehicle : @vehicleNumber
 Driver : @driverName
 Phone : @phoneNumber
 Type : @vehicleType
-Rate/hr : ₹@rate
+Rate : ₹@rate / @perHours hr
 
 Entry Time : @entryTime
 Current Time : @exitTime
@@ -19,7 +19,7 @@ Current Time : @exitTime
 Status : ACTIVE PARKING
 
 Duration : @duration
-Billable Hours : @billableHours
+Billable Blocks : @billableBlocks
 
 Total Amount : ₹@amount
 
@@ -32,7 +32,7 @@ Vehicle : @vehicleNumber
 Driver : @driverName
 Phone : @phoneNumber
 Type : @vehicleType
-Rate/hr : ₹@rate
+Rate : ₹@rate / @perHours hr
 
 Entry Time : @entryTime
 Exit Time : @exitTime
@@ -40,46 +40,37 @@ Exit Time : @exitTime
 Status : VEHICLE EXITED
 
 Duration : @duration
-Billable Hours : @billableHours
+Billable Blocks : @billableBlocks
 
 Total Amount : ₹@amount
 
 Thank you for visiting 🙏`;
 
 export async function saveMessageTemplates(data) {
-
     try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
         console.log("Save template error", e);
     }
-
 }
 
 export async function getMessageTemplates() {
-
     try {
-
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
 
         if (!raw) {
-
             return {
                 active: DEFAULT_ACTIVE_TEMPLATE,
                 inactive: DEFAULT_EXIT_TEMPLATE
             };
-
         }
 
         return JSON.parse(raw);
 
     } catch (e) {
-
         return {
             active: DEFAULT_ACTIVE_TEMPLATE,
             inactive: DEFAULT_EXIT_TEMPLATE
         };
-
     }
-
 }

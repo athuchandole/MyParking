@@ -1,9 +1,10 @@
 //Parking/screens/Checkin.js
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Modal, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-import { getParkingRates } from '../storage/ParkingRate';
+import { getParkingRates, getRateMeta } from '../storage/ParkingRate';
 import { saveCheckin, getCheckins } from '../storage/CheckinStorage';
 import { getDefaultPlate } from '../storage/DefaultPlateStorage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -34,6 +35,7 @@ export default function Checkin({ navigation, route }) {
     const [selectedVehicle, setSelectedVehicle] = useState(null);
 
     const [rates, setRates] = useState({ bike: '10', auto: '20', car: '40' });
+    const [rateMeta, setRateMeta] = useState({ perHours: '1' }); // NEW
 
     const [fontsLoaded] = useFonts({
         ...MaterialCommunityIcons.font,
@@ -43,7 +45,10 @@ export default function Checkin({ navigation, route }) {
 
     const loadRates = async () => {
         const data = await getParkingRates();
+        const meta = await getRateMeta(); // NEW
+
         setRates(data);
+        setRateMeta(meta); // NEW
     };
 
     const loadDefaultPlate = async () => {
@@ -97,6 +102,7 @@ export default function Checkin({ navigation, route }) {
     ];
 
     const currentRate = rates[selectedVehicle] || '0';
+    const perHours = rateMeta?.perHours || '1'; // NEW
 
     const handleVehicleNumber = (text) => {
 
@@ -197,6 +203,7 @@ export default function Checkin({ navigation, route }) {
         const data = {
             vehicleType: selectedVehicle,
             rate: currentRate,
+            perHours, // NEW (store rate basis)
             vehicleNumber,
             driverName,
             phoneNumber,
@@ -276,7 +283,7 @@ export default function Checkin({ navigation, route }) {
 
                 </View>
 
-                {/* STANDARD RATE UI RESTORED */}
+                {/* RATE UI UPDATED */}
 
                 <View style={styles.section}>
 
@@ -287,7 +294,9 @@ export default function Checkin({ navigation, route }) {
                             <Text style={styles.rateText}>Standard Parking Rate</Text>
                         </View>
 
-                        <Text style={styles.rateAmount}>₹{currentRate}/hr</Text>
+                        <Text style={styles.rateAmount}>
+                            ₹{currentRate} / {perHours} hr
+                        </Text>
 
                     </View>
 

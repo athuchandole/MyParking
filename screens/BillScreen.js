@@ -14,62 +14,60 @@ export default function BillScreen({ route, navigation }) {
     const exit = new Date(item.checkoutAt);
 
     const diff = exit - entry;
+
     const hrs = Math.floor(diff / (1000 * 60 * 60));
     const mins = Math.floor((diff / (1000 * 60)) % 60);
 
     const totalHours = Math.max(1, Math.ceil(diff / (1000 * 60 * 60)));
-    const amount = totalHours * item.rate;
+
+    const rate = Number(item.rate || 0);
+    const perHours = Number(item.perHours || 1);
+
+    const billableBlocks = Math.ceil(totalHours / perHours);
+    const amount = billableBlocks * rate;
 
     return (
         <View style={styles.container}>
             <Header title="Parking Bill" navigation={navigation} />
             <ScrollView>
 
-                {/* Images Row */}
                 <View style={styles.section}>
                     <View style={styles.imageRow}>
                         <View style={styles.imageBox}>
                             <Image source={{ uri: item.driverImage }} style={styles.fullImage} />
-                            <View style={styles.imageLabel}>
-                                <Text style={styles.imageLabelText}>DRIVER</Text>
-                            </View>
                         </View>
                         <View style={styles.imageBox}>
                             <Image source={{ uri: item.vehicleImage }} style={styles.fullImage} />
-                            <View style={styles.imageLabel}>
-                                <Text style={styles.imageLabelText}>{item.vehicleType}</Text>
-                            </View>
                         </View>
                     </View>
                 </View>
 
-                {/* Vehicle Info Card */}
                 <View style={styles.section}>
                     <View style={styles.infoCard}>
                         <Text style={styles.driverName}>{item.driverName}</Text>
+
                         <View style={styles.numberPlate}>
                             <Text style={styles.vehicleNumber}>{item.vehicleNumber}</Text>
                         </View>
+
                         <View style={styles.vehicleTypeRow}>
                             <MaterialCommunityIcons name="car" size={20} color="#137fec" />
                             <Text style={styles.vehicleTypeText}>{item.vehicleType}</Text>
                         </View>
-                        <View style={styles.infoTimes}>
-                            <Text style={styles.timeText}>Entry: {entry.toLocaleString()}</Text>
-                            <Text style={styles.timeText}>Exit: {exit.toLocaleString()}</Text>
-                        </View>
+
+                        <Text style={styles.timeText}>Entry: {entry.toLocaleString()}</Text>
+                        <Text style={styles.timeText}>Exit: {exit.toLocaleString()}</Text>
                     </View>
                 </View>
 
-                {/* Receipt */}
                 <View style={styles.section}>
                     <View style={styles.receipt}>
                         <Text style={styles.title}>PARKING RECEIPT</Text>
-                        <Row icon="login" label="Entry Time" value={entry.toLocaleString()} />
-                        <Row icon="logout" label="Exit Time" value={exit.toLocaleString()} />
+
                         <Row icon="clock-outline" label="Duration" value={`${hrs}h ${mins}m`} highlight />
-                        <Row icon="calculator" label="Billable Hours" value={`${totalHours} hr`} />
-                        <Row icon="cash" label="Rate / Hour" value={`₹${item.rate}`} />
+                        <Row icon="calculator" label="Billable Blocks" value={`${billableBlocks}`} />
+                        <Row icon="cash" label={`Rate / ${perHours} hr`} value={`₹${rate}`} />
+
                         <View style={styles.amountBox}>
                             <View>
                                 <Text style={styles.amountLabel}>Total Amount</Text>
