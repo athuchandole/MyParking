@@ -29,11 +29,7 @@ export default function Checkout({ route, navigation }) {
     const billableBlocks = Math.ceil(totalHours / perHours);
     const amount = billableBlocks * rate;
 
-    const goHome = () => {
-        navigation.reset({ index: 0, routes: [{ name: "Home" }] });
-    };
-
-    // ✅ WhatsApp logic (copied EXACT behavior)
+    // ✅ WhatsApp helpers
     const replaceVars = (template, data) => {
         let msg = template;
         Object.keys(data).forEach(key => {
@@ -102,22 +98,29 @@ export default function Checkout({ route, navigation }) {
         }
     };
 
-    // ✅ Only change: wrapped with popup + share
+    // ✅ FINAL FIXED FLOW
     const confirmExit = async () => {
 
         setShowModal(false);
 
         if (item.status === "inactive") {
             Alert.alert("Vehicle already checked out");
-            goHome();
+            navigation.goBack();
             return;
         }
 
         const success = await checkoutVehicle(item.id);
 
         if (success) {
-            await shareOnWhatsApp(); // ✅ Added
-            Alert.alert("Success", "Vehicle marked OUT", [{ text: "OK", onPress: goHome }]);
+
+            // ✅ Step 1: Go back FIRST (remove this screen)
+            navigation.goBack();
+
+            // ✅ Step 2: Delay to ensure screen is unmounted
+            setTimeout(() => {
+                shareOnWhatsApp();
+            }, 500);
+
         } else {
             Alert.alert("Error", "Checkout failed");
         }
@@ -185,8 +188,6 @@ export default function Checkout({ route, navigation }) {
                     </View>
                 </View>
 
-                {/* ❌ Share button REMOVED (nothing else touched) */}
-
                 <View style={styles.sectionPadding}>
                     <View style={styles.receiptCard}>
                         <Text style={styles.receiptTitle}>PARKING RECEIPT</Text>
@@ -243,7 +244,7 @@ export default function Checkout({ route, navigation }) {
     );
 }
 
-// ✅ untouched
+// unchanged helper
 function ReceiptRow({ icon, label, value, highlight }) {
     return (
         <View style={styles.receiptRow}>
@@ -256,19 +257,17 @@ function ReceiptRow({ icon, label, value, highlight }) {
     );
 }
 
-// ✅ FULL original styles (no change)
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f6f7f8' },
     sectionPadding: { padding: 16 },
-
     imageRow: { flexDirection: 'row', gap: 12 },
     imageBox: { flex: 1, height: 180, borderRadius: 12, overflow: 'hidden' },
     fullImage: { width: '100%', height: '100%' },
     imageLabel: { position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(255,255,255,0.9)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
     imageLabelText: { fontSize: 11, fontWeight: '700', color: '#137fec' },
 
-    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0", shadowColor: '#000', shadowOpacity: 0.08, shadowOffset: { width: 0, height: 4 }, shadowRadius: 8, elevation: 3 },
-    driverName: { fontSize: 20, fontWeight: '900', color: '#111', marginBottom: 8 },
+    infoCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: "#e2e8f0", elevation: 3 },
+    driverName: { fontSize: 20, fontWeight: '900', marginBottom: 8 },
     numberPlate: { backgroundColor: '#f0f0f0', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 8, alignSelf: 'flex-start' },
     vehicleNumber: { fontSize: 16, fontWeight: '700', letterSpacing: 2 },
     vehicleTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },

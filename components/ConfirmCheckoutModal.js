@@ -1,18 +1,30 @@
-//components/ConfirmCheckoutModal.js
+// components/ConfirmCheckoutModal.js
 
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-export default function ConfirmCheckoutModal({
+/**
+ * NOTE:
+ * - No self import
+ * - No barrel (index.js) import
+ * - Pure standalone component (prevents require cycle)
+ */
+
+const ConfirmCheckoutModal = ({
     visible,
     onClose,
     onConfirm,
     name,
     vehicleNumber,
     amount
-}) {
+}) => {
     return (
-        <Modal visible={visible} transparent animationType="fade">
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            statusBarTranslucent
+        >
             <View style={styles.overlay}>
                 <View style={styles.modalBox}>
 
@@ -41,11 +53,19 @@ export default function ConfirmCheckoutModal({
 
                     {/* Buttons */}
                     <View style={styles.actions}>
-                        <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+                        <TouchableOpacity
+                            style={styles.cancelBtn}
+                            onPress={onClose}
+                            activeOpacity={0.8}
+                        >
                             <Text style={styles.cancelText}>Cancel</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.checkoutBtn} onPress={onConfirm}>
+                        <TouchableOpacity
+                            style={styles.checkoutBtn}
+                            onPress={onConfirm}
+                            activeOpacity={0.9}
+                        >
                             <Text style={styles.checkoutText}>Checkout</Text>
                         </TouchableOpacity>
                     </View>
@@ -54,7 +74,9 @@ export default function ConfirmCheckoutModal({
             </View>
         </Modal>
     );
-}
+};
+
+export default React.memo(ConfirmCheckoutModal); // ✅ prevents unnecessary re-renders
 
 const styles = StyleSheet.create({
     overlay: {
@@ -68,7 +90,8 @@ const styles = StyleSheet.create({
         width: "88%",
         backgroundColor: "#fff",
         borderRadius: 18,
-        padding: 22
+        padding: 22,
+        elevation: 5
     },
 
     title: {
