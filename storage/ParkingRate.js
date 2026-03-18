@@ -12,7 +12,7 @@ export const defaultRates = {
 };
 
 export const defaultRateMeta = {
-    perHours: '1', // NEW (rate per X hours)
+    perHours: '24',
 };
 
 // -------------------- RATES --------------------

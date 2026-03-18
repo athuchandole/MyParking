@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "Parking",
-    "slug": "Parking",
+    "name": "MyParking",
+    "slug": "MyParking",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/app-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,17 +17,14 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/app-icon.png",
+        "backgroundImage": "./assets/app-icon.png",
+        "monochromeImage": "./assets/app-icon.png"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/app-icon.png"
     },
-    "plugins": [
-      "expo-asset",
-      "expo-font"
-    ]
+    "plugins": ["expo-asset", "expo-font"]
   }
 }
