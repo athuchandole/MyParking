@@ -86,13 +86,13 @@ export default function Onboarding() {
             setCurrentIndex(currentIndex + 1);
         } else {
             await AsyncStorage.setItem("hasSeenOnboarding", "true");
-            navigation.replace("Home");
+            navigation.replace("MainTabs");
         }
     };
 
     const handleSkip = async () => {
         await AsyncStorage.setItem("hasSeenOnboarding", "true");
-        navigation.replace("Home");
+        navigation.replace("MainTabs");
     };
 
     const renderDots = () => {

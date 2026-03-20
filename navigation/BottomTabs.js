@@ -20,7 +20,6 @@ const RootStack = createNativeStackNavigator();
 /* -------------------------------------------------------
    HOME STACK
 ------------------------------------------------------- */
-
 function HomeStackScreen() {
 
     return (
@@ -66,7 +65,6 @@ function HomeStackScreen() {
 /* -------------------------------------------------------
    DASHBOARD STACK
 ------------------------------------------------------- */
-
 function DashboardStackScreen() {
 
     return (
@@ -112,7 +110,6 @@ function DashboardStackScreen() {
 /* -------------------------------------------------------
    SETTINGS STACK
 ------------------------------------------------------- */
-
 function SettingsStackScreen() {
 
     return (
@@ -143,7 +140,6 @@ function SettingsStackScreen() {
 /* -------------------------------------------------------
    BOTTOM TAB NAVIGATION
 ------------------------------------------------------- */
-
 export default function BottomTabs() {
 
     const insets = useSafeAreaInsets();
