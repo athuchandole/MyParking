@@ -14,6 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageTemplates } from "../storage/MessageTemplateStorage";
 import ConfirmCheckinModal from '../components/ConfirmCheckinModal';
 
+import { openWhatsApp } from "../utils/whatsapp";
+
 export default function Checkin({ navigation, route }) {
 
     const editMode = route?.params?.editMode || false;
@@ -149,9 +151,7 @@ export default function Checkin({ navigation, route }) {
             let phone = checkinItem.phoneNumber ? checkinItem.phoneNumber.replace(/[^0-9]/g, "") : "";
             let url = phone.length === 10 ? `whatsapp://send?phone=91${phone}&text=${encodeURIComponent(message)}` : `whatsapp://send?text=${encodeURIComponent(message)}`;
 
-            const supported = await Linking.canOpenURL(url);
-            if (supported) await Linking.openURL(url);
-            else Alert.alert("WhatsApp not installed");
+            await openWhatsApp(checkinItem.phoneNumber, message);
         } catch (e) {
             Alert.alert("Error", "Unable to share receipt");
         }

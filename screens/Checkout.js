@@ -92,12 +92,21 @@ export default function Checkout({ route, navigation }) {
                 url = `whatsapp://send?text=${encodeURIComponent(message)}`;
             }
 
-            const supported = await Linking.canOpenURL(url);
-
-            if (supported) {
+            try {
+                // Try opening WhatsApp app
                 await Linking.openURL(url);
-            } else {
-                Alert.alert("WhatsApp not installed");
+            } catch (e) {
+                // Fallback to browser (always works)
+                let webUrl = "";
+
+                if (phone.length === 10) {
+                    const fullNumber = `91${phone}`;
+                    webUrl = `https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`;
+                } else {
+                    webUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                }
+
+                await Linking.openURL(webUrl);
             }
 
         } catch (e) {
