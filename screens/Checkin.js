@@ -248,7 +248,7 @@ export default function Checkin({ navigation, route }) {
                     <Text style={styles.inputLabel}>Vehicle Number</Text>
                     <View style={styles.inputWrapper}>
                         <MaterialCommunityIcons name="card-text-outline" size={24} color="#888" style={styles.inputIcon} />
-                        <TextInput style={styles.input} placeholder="MH 12 AB 1234" value={vehicleNumber} editable={!editMode} onChangeText={handleVehicleNumber} keyboardType={keyboardType} />
+                        <TextInput style={styles.input} placeholder="MH 12 AB 1234" placeholderTextColor="#9ca3af" value={vehicleNumber} editable={!editMode} onChangeText={handleVehicleNumber} keyboardType={keyboardType} />
                         {editMode && <MaterialCommunityIcons name="lock" size={18} color="red" />}
                     </View>
                     {defaultPlate.part1 && defaultPlate.part2 && !editMode && (
@@ -258,13 +258,13 @@ export default function Checkin({ navigation, route }) {
                     <Text style={styles.inputLabel}>Driver Name</Text>
                     <View style={styles.inputWrapper}>
                         <MaterialCommunityIcons name="account" size={24} color="#888" style={styles.inputIcon} />
-                        <TextInput style={styles.input} placeholder="Enter full name" value={driverName} onChangeText={setDriverName} />
+                        <TextInput style={styles.input} placeholder="Enter full name" value={driverName} placeholderTextColor="#9ca3af" onChangeText={setDriverName} />
                     </View>
 
                     <Text style={styles.inputLabel}>Phone Number</Text>
                     <View style={styles.inputWrapper}>
                         <MaterialCommunityIcons name="phone" size={24} color="#888" style={styles.inputIcon} />
-                        <TextInput style={styles.input} placeholder="Enter phone number" keyboardType="number-pad" value={phoneNumber} onChangeText={text => setPhoneNumber(text.replace(/[^0-9]/g, '').slice(0, 10))} maxLength={10} />
+                        <TextInput style={styles.input} placeholder="Enter phone number" keyboardType="number-pad" placeholderTextColor="#9ca3af" value={phoneNumber} onChangeText={text => setPhoneNumber(text.replace(/[^0-9]/g, '').slice(0, 10))} maxLength={10} />
                     </View>
                 </View>
 

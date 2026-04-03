@@ -80,6 +80,7 @@ export default function SettingsScreen({ navigation }) {
                                 autoCapitalize="characters"
                                 onChangeText={setDefaultPart1}
                                 placeholder="AA"
+                                placeholderTextColor="#9ca3af"
                             />
                             <TextInput
                                 style={styles.plateInput}
@@ -88,6 +89,7 @@ export default function SettingsScreen({ navigation }) {
                                 keyboardType="numeric"
                                 onChangeText={setDefaultPart2}
                                 placeholder="00"
+                                placeholderTextColor="#9ca3af"
                             />
                         </View>
                         {showSaveButton && (

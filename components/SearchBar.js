@@ -40,6 +40,7 @@ export default function SearchBar({ value, onChange }) {
                 value={value}
                 onChangeText={onChange}
                 keyboardType={numericMode ? "numeric" : "default"}
+                placeholderTextColor="#9ca3af"
                 returnKeyType="search"
             />
 
