@@ -20,11 +20,15 @@
         "foregroundImage": "./assets/app-icon.png",
         "backgroundImage": "./assets/app-icon.png",
         "monochromeImage": "./assets/app-icon.png"
-      }
+      },
+      "package": "com.anonymous.MyParking"
     },
     "web": {
       "favicon": "./assets/app-icon.png"
     },
-    "plugins": ["expo-asset", "expo-font"]
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
   }
 }

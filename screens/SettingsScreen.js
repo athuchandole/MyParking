@@ -55,7 +55,7 @@ export default function SettingsScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <Header title="Settings" navigation={navigation} showBack={false} />
-            <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
 
                 {/* App Info */}
                 <View style={styles.section}>
@@ -164,6 +164,47 @@ export default function SettingsScreen({ navigation }) {
                     </View>
                 </View>
 
+                {/* Credits */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Credits</Text>
+                    <View style={styles.card}>
+                        <View style={styles.row}>
+                            <View style={styles.left}>
+                                <View style={styles.iconBox}>
+                                    <MaterialCommunityIcons name="account" size={20} color="#137fec" />
+                                </View>
+                                <Text style={styles.label}>Developed by</Text>
+                            </View>
+                            <Text style={styles.creditText}>Atharv Chandole</Text>
+                        </View>
+
+                        <View style={styles.divider} />
+
+                        <TouchableOpacity style={styles.row} onPress={() => Linking.openURL('mailto:athuchandole@gmail.com')}>
+                            <View style={styles.left}>
+                                <View style={styles.iconBox}>
+                                    <MaterialCommunityIcons name="email" size={20} color="#137fec" />
+                                </View>
+                                <Text style={styles.label}>Email</Text>
+                            </View>
+                            <Text style={styles.linkText}>athuchandole@gmail.com</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.row, { marginTop: 12 }]}
+                            onPress={() => Linking.openURL('https://instagram.com/athuchandole')}
+                        >
+                            <View style={styles.left}>
+                                <View style={styles.iconBox}>
+                                    <MaterialCommunityIcons name="instagram" size={20} color="#137fec" />
+                                </View>
+                                <Text style={styles.label}>Instagram</Text>
+                            </View>
+                            <Text style={styles.linkText}>@athuchadole</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
             </ScrollView>
         </View>
     );
@@ -192,4 +233,6 @@ const styles = StyleSheet.create({
     appVersion: { fontSize: 12, color: '#6b7280', marginTop: 4 },
     appSubtitle: { fontSize: 12, color: '#9ca3af', marginTop: 4, textAlign: 'center' },
     versionText: { fontSize: 14, fontWeight: '600', color: '#137fec' },
+    creditText: { fontSize: 14, fontWeight: '600', color: '#111827' },
+    linkText: { fontSize: 13, color: '#137fec', fontWeight: '500' },
 });
