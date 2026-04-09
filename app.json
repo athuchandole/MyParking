@@ -27,9 +27,15 @@
       "favicon": "./assets/app-icon.png"
     },
     "plugins": [
-      "expo-asset",
-      "expo-font"
-    ],
+         "expo-asset",
+         "expo-font",
+                [
+                  "expo-camera",
+                  {
+                    "cameraPermission": "Allow this app to access your camera"
+                  }
+                ]
+              ],
     "extra": {
       "eas": {
         "projectId": "293a2487-f59a-450e-b327-2be599825368"

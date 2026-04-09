@@ -8,15 +8,21 @@ import { getParkingRates, getRateMeta } from '../storage/ParkingRate';
 import { saveCheckin, getCheckins } from '../storage/CheckinStorage';
 import { getDefaultPlate } from '../storage/DefaultPlateStorage';
 import { useFocusEffect } from '@react-navigation/native';
-import { CameraView } from 'expo-camera';
 import Header from "../components/Header";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageTemplates } from "../storage/MessageTemplateStorage";
 import ConfirmCheckinModal from '../components/ConfirmCheckinModal';
-
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { openWhatsApp } from "../utils/whatsapp";
 
+
 export default function Checkin({ navigation, route }) {
+
+    const [permission, requestPermission] = useCameraPermissions();
+    // useEffect(() => {
+    //     requestPermission();
+    // }, []);
+
 
     const editMode = route?.params?.editMode || false;
     const editItem = route?.params?.item;
@@ -106,8 +112,33 @@ export default function Checkin({ navigation, route }) {
         else setKeyboardType('numeric');
     };
 
-    const openCamera = (type) => {
+    const openCamera = async (type) => {
         if (editMode) return;
+
+        if (!permission) {
+            Alert.alert("Loading", "Camera permission is loading, try again.");
+            return;
+        }
+
+        if (!permission.granted) {
+            const res = await requestPermission();
+
+            if (!res.granted) {
+                Alert.alert(
+                    "Permission Required",
+                    "Camera permission is needed to take photos",
+                    [
+                        { text: "Cancel" },
+                        {
+                            text: "Open Settings",
+                            onPress: () => Linking.openSettings()
+                        }
+                    ]
+                );
+                return;
+            }
+        }
+
         setCaptureType(type);
         setCameraVisible(true);
     };
@@ -195,6 +226,7 @@ export default function Checkin({ navigation, route }) {
     };
 
     if (!fontsLoaded) return null;
+    if (!permission) return null;
 
     return (
         <View style={styles.container}>
