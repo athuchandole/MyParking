@@ -57,17 +57,21 @@ export default function DashboardScreen({ navigation }) {
 
     list.forEach(v => {
 
-        if (v.status === "inactive") {
+        if (v.status === "inactive" && v.createdAt && v.checkoutAt && v.rate) {
 
             const entry = new Date(v.createdAt);
             const exit = new Date(v.checkoutAt);
 
+            // Ensure exit is after entry
+            let diffMs = exit - entry;
+            if (diffMs < 0) diffMs = 0;
+
             const hrs = Math.max(
                 1,
-                Math.ceil((exit - entry) / (1000 * 60 * 60))
+                Math.ceil(diffMs / (1000 * 60 * 60))
             );
 
-            revenue += hrs * v.rate;
+            revenue += hrs * parseFloat(v.rate);
         }
     });
 
