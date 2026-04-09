@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import BottomTabs from "./navigation/BottomTabs";
 import Onboarding from "./Onboarding";
@@ -21,7 +22,6 @@ export default function App() {
     const checkFirstLaunch = async () => {
 
       try {
-
         const value = await AsyncStorage.getItem(ONBOARDING_KEY);
 
         if (value === null) {
@@ -43,35 +43,39 @@ export default function App() {
   }, []);
 
   if (isFirstLaunch === null) {
-    return null; // or splash screen
+    return null;
   }
 
   return (
 
-    <SafeAreaProvider>
+    // ✅ MUST BE TOP LEVEL
+    <GestureHandlerRootView style={{ flex: 1 }}>
 
-      <NavigationContainer>
+      <SafeAreaProvider>
 
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <NavigationContainer>
 
-          {isFirstLaunch && (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+            {isFirstLaunch && (
+              <Stack.Screen
+                name="Onboarding"
+                component={Onboarding}
+              />
+            )}
+
             <Stack.Screen
-              name="Onboarding"
-              component={Onboarding}
+              name="MainTabs"
+              component={BottomTabs}
             />
-          )}
 
-          {/* ✅ FIX: Renamed from "Home" → "MainTabs" */}
-          <Stack.Screen
-            name="MainTabs"
-            component={BottomTabs}
-          />
+          </Stack.Navigator>
 
-        </Stack.Navigator>
+        </NavigationContainer>
 
-      </NavigationContainer>
+      </SafeAreaProvider>
 
-    </SafeAreaProvider>
+    </GestureHandlerRootView>
 
   );
 
